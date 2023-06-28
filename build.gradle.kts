@@ -43,3 +43,13 @@ kotlin {
 application {
     mainClass.set("MainKt")
 }
+
+distributions {
+    main {
+        contents {
+            from(".") {
+                include("txlib/**")
+            }
+        }
+    }
+}
