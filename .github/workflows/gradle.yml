@@ -20,7 +20,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      RELEASE_VERSION: ${{ github.ref }}
+      RELEASE_VERSION: ${GITHUB_SHA::6}
     steps:
     - uses: actions/checkout@v3
     - name: Set up JDK 11
