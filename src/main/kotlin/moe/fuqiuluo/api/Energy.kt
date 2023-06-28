@@ -2,13 +2,8 @@ package moe.fuqiuluo.api
 
 import com.tencent.crypt.Crypt
 import com.tencent.mobileqq.qsec.qsecdandelionsdk.Dandelion
-import io.ktor.server.application.*
-import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import moe.fuqiuluo.ext.failure
-import moe.fuqiuluo.ext.fetchGet
-import moe.fuqiuluo.ext.hex2ByteArray
-import moe.fuqiuluo.ext.toHexString
+import moe.fuqiuluo.ext.*
 import moe.fuqiuluo.unidbg.pool.work
 import moe.fuqiuluo.unidbg.workerPool
 import moe.fuqiuluo.utils.EMPTY_BYTE_ARRAY
@@ -23,9 +18,9 @@ fun Routing.configEnergy() {
             Dandelion.energy(this, data, salt)
         }
         if (sign == null) {
-            call.respond(APIResult(-1, "The instance is occupied and there are no idle instances", null))
+            failure(-1, "The instance is occupied and there are no idle instances")
         } else {
-            call.respond(APIResult(0, "success", sign.toHexString()))
+            success(data = sign.toHexString())
         }
     }
 
@@ -111,9 +106,9 @@ fun Routing.configEnergy() {
         }
 
         if (sign == null) {
-            call.respond(APIResult(-1, "The instance is occupied and there are no idle instances", null))
+            failure(-1, "The instance is occupied and there are no idle instances")
         } else {
-            call.respond(APIResult(0, "success", sign.toHexString()))
+            success(data = sign.toHexString())
         }
     }
 }

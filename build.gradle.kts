@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "moe.fuqiuluo"
-version = "1.0.5"
+version = "1.1.0"
 
 repositories {
     mavenCentral()
@@ -16,7 +16,6 @@ repositories {
 
 dependencies {
     testImplementation(kotlin("test"))
-
     implementation("io.ktor:ktor-server-content-negotiation-jvm:$ktor_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktor_version")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.3.3")
