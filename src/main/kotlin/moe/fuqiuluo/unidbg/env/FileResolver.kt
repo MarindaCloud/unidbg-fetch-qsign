@@ -81,6 +81,10 @@ class FileResolver(
             return FileResult.success(ByteArrayFileIO(oflags, path, "com.tencent.mobileqq:MSF".toByteArray()))
         }
 
+        if (path == "/data/app/~~vbcRLwPxS0GyVfqT-nCYrQ==/com.tencent.mobileqq-xJKJPVp9lorkCgR_w5zhyA==/lib/arm64/libfekit.so") {
+            return FileResult.failed(UnixEmulator.EACCES)
+        }
+
         if (path == "/system/bin/sh" || path == "/system/bin/ls" || path == "/system/lib/libc.so") {
             return FileResult.success(ByteArrayFileIO(oflags, path, byteArrayOf(0x7f, 0x45, 0x4c, 0x46, 0x02, 0x01, 0x01, 0x00)))
         }
