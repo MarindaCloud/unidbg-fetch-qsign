@@ -89,6 +89,12 @@ class QSecJni(
         super.callVoidMethodV(vm, dvmObject, signature, vaList)
     }
 
+    override fun getObjectField(vm: BaseVM, dvmObject: DvmObject<*>, signature: String): DvmObject<*> {
+        if (signature == "android/content/pm/ApplicationInfo->nativeLibraryDir:Ljava/lang/String;") {
+            return StringObject(vm, "/data/app/~~vbcRLwPxS0GyVfqT-nCYrQ==/com.tencent.mobileqq-xJKJPVp9lorkCgR_w5zhyA==/lib/arm64")
+        }
+        return super.getObjectField(vm, dvmObject, signature)
+    }
     override fun setObjectField(vm: BaseVM, dvmObject: DvmObject<*>, signature: String, value: DvmObject<*>) {
         if (signature == "com/tencent/mobileqq/sign/QQSecuritySign\$SignResult->token:[B") {
             val data = value.value as ByteArray
@@ -261,8 +267,6 @@ class QSecJni(
         }
         super.callStaticVoidMethodV(vm, dvmClass, signature, vaList)
     }
-
-
 
     override fun callObjectMethodV(
         vm: BaseVM,
