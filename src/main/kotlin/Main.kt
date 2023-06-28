@@ -35,12 +35,14 @@ private val logger = LoggerFactory.getLogger(Main::class.java)
 var debug: Boolean = false // 调试模式
 
 fun main(args: Array<String>) {
+    var host: String
     var port = 0 // API端口
-    var workerCount = 5 // UNIDBG实例数量
+    var workerCount = 2 // UNIDBG实例数量
     var coreLibPath: File // 核心二进制文件路径
     val reloadInterval: Long = 40 // 实例重载间隔（分钟）
 
     args().also {
+        host = it["host", "Lack of server.host."]
         port = it["port", "Lack of server.port."]
             .toInt(1 .. 65535) { "Port is out of range." }
         workerCount = it["count", "Lack of workerCount(count)."]
@@ -66,7 +68,7 @@ fun main(args: Array<String>) {
         } }
     }, reloadInterval)
 
-    embeddedServer(Netty, port = port, module = Application::init)
+    embeddedServer(Netty, host = host, port = port, module = Application::init)
         .start(wait = true)
 }
 
