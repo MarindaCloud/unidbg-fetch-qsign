@@ -5,6 +5,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import moe.fuqiuluo.ext.success
 
 @Serializable
 data class APIResult<T>(val code: Int,
@@ -14,6 +15,6 @@ data class APIResult<T>(val code: Int,
 
 fun Routing.configIndex() {
     get("/") {
-        call.respond(APIResult(0, "success", "API is common mode"))
+        success(data = "unidbg-fetch-qsign: ${System.currentTimeMillis()}")
     }
 }

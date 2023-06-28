@@ -9,7 +9,7 @@ import moe.fuqiuluo.api.APIResult
 suspend fun PipelineContext<Unit, ApplicationCall>.fetchGet(key: String, def: String? = null, err: String? = null): String? {
     val data = call.parameters[key] ?: def
     if (data == null && err != null) {
-        call.respond(APIResult(1, err, "failed"))
+        failure(1, err)
     }
     return data
 }
@@ -17,11 +17,15 @@ suspend fun PipelineContext<Unit, ApplicationCall>.fetchGet(key: String, def: St
 suspend fun PipelineContext<Unit, ApplicationCall>.fetchPost(params: Parameters, key: String, def: String? = null, err: String? = null): String? {
     val data = params[key] ?: def
     if (data == null && err != null) {
-        call.respond(APIResult(1, err, "failed"))
+        failure(1, err)
     }
     return data
 }
 
 suspend fun PipelineContext<Unit, ApplicationCall>.failure(code: Int, msg: String) {
     call.respond(APIResult(code, msg, "failed"))
+}
+
+suspend fun <T> PipelineContext<Unit, ApplicationCall>.success(code: Int = 0, msg: String = "success", data: T) {
+    call.respond(APIResult(code, msg, data))
 }
