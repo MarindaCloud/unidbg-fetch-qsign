@@ -4,7 +4,6 @@ package moe.fuqiuluo.net
 
 import QUA
 import com.tencent.crypt.Crypt
-import com.tencent.mobileqq.fe.FEKit
 import com.tencent.mobileqq.sign.QQSecuritySign
 import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
@@ -68,36 +67,6 @@ class SSOReserveField {
         @ProtoNumber(28) var sso_ip_origin: Int = Int.MIN_VALUE,
         @ProtoNumber(30) var presure_token: ByteArray = EMPTY_BYTE_ARRAY,
     )
-
-    /**
-     * [9](i):0
-     * [12](b):e18e924a12569aab1b61730110001b617301
-     * [14](i):0
-     * [16](b):2304667768
-     * [18](i):0
-     * [19](i):1
-     * [20](i):1
-     * [21](i):0
-     * [24](b):
-     *    [24.1](b):\f$
-     *    [24.2](b):
-     *    [24.3](b):
-     *       [24.3.2](b):V1_AND_SQ_8.9.50_3898_YYB_D
-     * [28](i):3
-     */
-    @Serializable
-    data class HeadSign(
-        @ProtoNumber(9) var a: Int = 0,
-        @ProtoNumber(12) var qimei: ByteArray = EMPTY_BYTE_ARRAY,
-        @ProtoNumber(14) var b: Int = 0,
-        @ProtoNumber(16) var uid: ByteArray = EMPTY_BYTE_ARRAY,
-        @ProtoNumber(18) var c: Int = 0,
-        @ProtoNumber(19) var d: Int = 1,
-        @ProtoNumber(20) var e: Int = 1,
-        @ProtoNumber(21) var f: Int = 0,
-        @ProtoNumber(24) var sec_info: SsoSecureInfo? = null,
-        @ProtoNumber(28) var g: Int = 3,
-    )
 }
 
 private fun buildData(ssoPacket: SsoPacket) = newBuilder().apply {
@@ -130,25 +99,6 @@ private fun buildData(ssoPacket: SsoPacket) = newBuilder().apply {
             this.writeShort(it.length + 2)
             this.writeString(it)
         }
-//        ProtoBuf.encodeToByteArray(SSOReserveField.ReserveFields().also { reserve ->
-//            reserve.flag = 1
-//            reserve.locale_id = 2052
-//            reserve.qimei = "".toByteArray()
-//            reserve.newconn_flag = 0
-//            reserve.uid = ""
-//            reserve.imsi = 0
-//            reserve.network_type = 1
-//            reserve.ip_stack_type = 1
-//            reserve.message_type = 8
-//            reserve.trans_info.add(SSOReserveField.SsoMapEntry(
-//                "client_conn_seq", (System.currentTimeMillis() / 1000).toString().toByteArray()
-//            ))
-//            reserve.nt_core_version = 100
-//            reserve.sso_ip_origin = 2
-//        }).let {
-//            this.writeInt(it.size + 4)
-//            this.writeBytes(it)
-//        }
 
         val sign = workerPool.work {
             QQSecuritySign.getSign(this,
@@ -160,11 +110,22 @@ private fun buildData(ssoPacket: SsoPacket) = newBuilder().apply {
             ).value
         }!!
 
-        // When I get SignResult, the global qimei is not initialized,so that I have to use a empty qimei
-        ProtoBuf.encodeToByteArray(SSOReserveField.HeadSign().also { headSign ->
-            headSign.qimei =  "".toByteArray()
-            headSign.uid = ssoPacket.uin.toByteArray()
-            headSign.sec_info = SSOReserveField.SsoSecureInfo().also { secureInfo ->
+        ProtoBuf.encodeToByteArray(SSOReserveField.ReserveFields().also { reserve ->
+            reserve.flag = 1
+            reserve.locale_id = 2052
+            reserve.qimei = "".toByteArray()
+            reserve.newconn_flag = 0
+            reserve.uid = ssoPacket.uin
+            reserve.imsi = 0
+            reserve.network_type = 1
+            reserve.ip_stack_type = 1
+            reserve.message_type = 8
+            reserve.trans_info.add(SSOReserveField.SsoMapEntry(
+                "client_conn_seq", (System.currentTimeMillis() / 1000).toString().toByteArray()
+            ))
+            reserve.nt_core_version = 100
+            reserve.sso_ip_origin = 2
+            reserve.sec_info = SSOReserveField.SsoSecureInfo().also { secureInfo ->
                 secureInfo.sec_sig = sign.sign
                 secureInfo.sec_device_token = sign.token
                 secureInfo.sec_extra = sign.extra
