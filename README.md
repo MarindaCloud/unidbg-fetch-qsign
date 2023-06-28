@@ -25,9 +25,35 @@ bash bin/unidbg-fetch-qsign --port=8080  --count=1 --library=txlib\8.9.63 --andr
  - --count=unidbg实例数量 (建议等于核心数*2) 【数值越大并发能力越强，内存占用越大】
  - --library=存放核心so文件的文件夹绝对路径
 
-## Dokcer部署
+## Docker部署
 
 [xzhouqd/qsign](https://hub.docker.com/r/xzhouqd/qsign)
+
+## docker-compose部署
+
+直接使用openjdk11启动服务
+
+```yaml
+version: '2'
+
+services:
+  qsign:
+    image: openjdk:11.0-jdk
+    environment:
+      TZ: Asia/Shanghai
+    restart: always
+    working_dir: /app
+    # 按需修改相关参数
+    command: bash bin/unidbg-fetch-qsign --port=8080 --count=1 --library=txlib/8.9.63 --android_id=someandroidid
+    volumes:
+      # 当前目录放置qsign的解压包
+      - ./unidbg-fetch-qsign:/app
+      # 当前目录放置txlib
+      - ./txlib:/app/txlib
+    ports:
+      # 按需调整宿主机端口
+      - 8901:8080
+```
 
 # 使用API
 
