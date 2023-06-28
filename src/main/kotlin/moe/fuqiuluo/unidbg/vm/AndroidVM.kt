@@ -1,6 +1,8 @@
 package moe.fuqiuluo.unidbg.vm
 
 import com.github.unidbg.arm.backend.DynarmicFactory
+import com.github.unidbg.arm.backend.HypervisorFactory
+import com.github.unidbg.arm.backend.KvmFactory
 import com.github.unidbg.linux.android.AndroidEmulatorBuilder
 import com.github.unidbg.linux.android.dvm.DalvikModule
 import com.github.unidbg.linux.android.dvm.DvmClass
@@ -14,8 +16,7 @@ open class AndroidVM(packageName: String): Closeable {
         .for64Bit()
         .setProcessName(packageName)
         .addBackendFactory(DynarmicFactory(true))
-        // 修复Linux arm设备，不支持的问题
-        //.addBackendFactory(KvmFactory(true))
+        .addBackendFactory(KvmFactory(true))
         //.addBackendFactory(HypervisorFactory(true))
         .build()!!
     protected val memory = emulator.memory!!
