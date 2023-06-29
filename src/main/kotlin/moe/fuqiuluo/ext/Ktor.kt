@@ -25,7 +25,3 @@ suspend fun PipelineContext<Unit, ApplicationCall>.fetchPost(params: Parameters,
 suspend fun PipelineContext<Unit, ApplicationCall>.failure(code: Int, msg: String) {
     call.respond(APIResult(code, msg, "failed"))
 }
-
-suspend fun <T> PipelineContext<Unit, ApplicationCall>.success(code: Int = 0, msg: String = "success", data: T) {
-    call.respond(APIResult(code, msg, data))
-}

@@ -5,7 +5,6 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
-import moe.fuqiuluo.ext.success
 
 @Serializable
 data class APIResult<T>(val code: Int,
@@ -15,6 +14,6 @@ data class APIResult<T>(val code: Int,
 
 fun Routing.configIndex() {
     get("/") {
-        success(data = "unidbg-fetch-qsign: ${System.currentTimeMillis()}")
+        call.respond("IAA")
     }
 }

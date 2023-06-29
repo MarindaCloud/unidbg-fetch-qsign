@@ -2,6 +2,8 @@ package moe.fuqiuluo.api
 
 import com.tencent.crypt.Crypt
 import com.tencent.mobileqq.qsec.qsecdandelionsdk.Dandelion
+import io.ktor.server.application.*
+import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import moe.fuqiuluo.ext.*
 import moe.fuqiuluo.unidbg.pool.work
@@ -20,7 +22,7 @@ fun Routing.configEnergy() {
         if (sign == null) {
             failure(-1, "The instance is occupied and there are no idle instances")
         } else {
-            success(data = sign.toHexString())
+            call.respond(APIResult(0, "success", sign.toHexString()))
         }
     }
 
@@ -108,7 +110,7 @@ fun Routing.configEnergy() {
         if (sign == null) {
             failure(-1, "The instance is occupied and there are no idle instances")
         } else {
-            success(data = sign.toHexString())
+            call.respond(APIResult(0, "success", sign.toHexString()))
         }
     }
 }
