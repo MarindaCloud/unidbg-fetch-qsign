@@ -19,7 +19,7 @@ open class AndroidVM(packageName: String): Closeable {
         .for64Bit()
         .setProcessName(packageName)
         .addBackendFactory(DynarmicFactory(true))
-        .addBackendFactory(KvmFactory(true))
+        //.addBackendFactory(KvmFactory(true))
         // 修复Linux arm设备，不支持的问题
         //.addBackendFactory(HypervisorFactory(true))
         .build()!!
