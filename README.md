@@ -4,6 +4,13 @@
 
 > 多人使用请提高count值以提高并发量！！！
 
+# 切记
+
+ - 公共API具有高风险可能
+ - 请使用与协议对应版本的libfekit.so文件
+ - QSign基于Android平台，其它平台Sign计算的参数不同，不互通（例如：IPad）。
+ - 不支持载入Tim.apk的so文件。
+
 # 部署方法
 
 ## Jar部署
@@ -25,6 +32,7 @@ bash bin/unidbg-fetch-qsign --host=0.0.0.0 --port=8080  --count=2 --library=txli
 - --port=你的端口
  - --count=unidbg实例数量 (建议等于核心数) 【数值越大并发能力越强，内存占用越大】
  - --library=存放核心so文件的文件夹绝对路径
+- [--dynamic] 可选参数：是否开启动态引擎（加速Sign计算，有时候会出现[#52](https://github.com/fuqiuluo/unidbg-fetch-qsign/issues/52)）
 
 ## Docker部署
 

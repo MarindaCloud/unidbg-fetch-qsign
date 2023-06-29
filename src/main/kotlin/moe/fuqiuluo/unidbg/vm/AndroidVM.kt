@@ -14,11 +14,13 @@ import java.io.Closeable
 import java.io.File
 import java.util.Arrays
 
-open class AndroidVM(packageName: String): Closeable {
+open class AndroidVM(packageName: String, isDynarmic: Boolean): Closeable {
     internal val emulator = AndroidEmulatorBuilder
         .for64Bit()
         .setProcessName(packageName)
-        .addBackendFactory(DynarmicFactory(true))
+        .apply {
+            if (isDynarmic) addBackendFactory(DynarmicFactory(true))
+        }
         //.addBackendFactory(KvmFactory(true))
         // 修复Linux arm设备，不支持的问题
         //.addBackendFactory(HypervisorFactory(true))
