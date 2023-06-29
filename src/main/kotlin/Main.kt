@@ -13,7 +13,6 @@ import moe.fuqiuluo.comm.invoke
 import moe.fuqiuluo.ext.toInt
 import moe.fuqiuluo.unidbg.QSecVMWorker
 import moe.fuqiuluo.unidbg.pool.FixedWorkPool
-import moe.fuqiuluo.unidbg.pool.work
 import moe.fuqiuluo.unidbg.workerPool
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -25,11 +24,12 @@ import java.io.File
  */
 
 
-var QQ_VERSION = "8.9.63"
+var QQ_VERSION = "8.9.63" // 获取TX远程SecConfig配置版本信息
 var QQ_CODE = "4186"
 var QUA = "V1_AND_SQ_8.9.63_4188_HDBM_T"
 var CHANNEL_VERSION = "6.100.248"
 var ANDROID_ID = ""
+var isDynarmic: Boolean = false
 
 private val logger = LoggerFactory.getLogger(Main::class.java)
 var debug: Boolean = false // 调试模式
@@ -53,6 +53,7 @@ fun main(args: Array<String>) {
         }
 
         ANDROID_ID = it["android_id", "Lack of android_id"]
+        isDynarmic = "dynarmic" in it
 
         debug = "debug" in it
     }
@@ -62,7 +63,7 @@ fun main(args: Array<String>) {
 
     workerPool = FixedWorkPool(workerCount, {
         logger.info("Try to construct QSignWorker.")
-        QSecVMWorker(it, coreLibPath).apply { work {
+        QSecVMWorker(it, coreLibPath, isDynarmic).apply { work {
             init()
             FEKit.init(this)
         } }
