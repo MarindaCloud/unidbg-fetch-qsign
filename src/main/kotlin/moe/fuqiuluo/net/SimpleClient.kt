@@ -83,5 +83,6 @@ class SimpleClient(
 
     override fun close() {
         socket.close()
+        selectorManager.close()
     }
 }
