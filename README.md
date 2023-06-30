@@ -75,7 +75,16 @@ services:
 ### sign
 
 ```kotlin
-# http://127.0.0.1:8080/sign?uin=[UIN]&qua=V1_AND_SQ_8.9.63_4188_HDBM_T&cmd=[CMD]&seq=[SEQ]&buffer=[BUFFER]
+# http://127.0.0.1:8080/sign?uin=[UIN]&qua=[QUA]&cmd=[CMD]&seq=[SEQ]&buffer=[BUFFER]
+[UIN]：Bot的QQ号。实例值：“11451419198”
+[QUA]：是手机QQ运行时，APP的某些信息，一般会在启动时得到。实例值：“V1_AND_SQ_8.9.63_4188_HDBM_T”
+[CMD]：指令类型，在做什么的时候需要的sign就什么时候用，需要注意的是不仅登录的时候需要sign，发信息也需要带sign，所以CMD才有很多种。实例值：“wtlogin.login”
+[SEQ]：意义不明的签名数字戳，看起来像时间戳。实例值：“1848698645”
+[BUFFER]：密文，将byte数组转换为HEX发送。实例值：“0C099F0C099F0C099F”
+
+因为有些时候密文会过长，导致超出get的长度上限，因此sign支持POST
+content-type为application/x-www-form-urlencoded
+正文和GET写法格式一样："uin=" + qq + "&qua=" + qua + "&cmd=" + cmd + "&seq=" + seq + "&buffer=" + DataUtils.byteArrayToHex(buffer)
 ```
 
 ### 登录包energy(tlv544)
@@ -83,5 +92,9 @@ services:
 下面这个只是个例子
 
 ```kotlin
-# http://127.0.0.1:8080/energy?&version=6.0.0.2534&uin=1234567&guid=ABCDABCDABCDABCDABCDABCDABCDABCD&data=810_f
+# http://127.0.0.1:8080/energy?&version=[VERSION]&uin=[UIN]&guid=[GUID]&data=[DATA]
+[VERSION]：注意！这里的VERSION指的不是QQ的版本号，而是SDK Version，可以在QQ安装包中找到此信息
+[UIN]：Bot的QQ号。实例值：“11451419198”
+[GUID]：密文，将byte数组转换为HEX发送，一般不会很长，不会超过GET上限。实例值：“0C099F0C099F0C099F”
+[DATA]：实际上是"mode"，QQ在运行时会随机挑选一个作为加密题目，要根据题目算出密文结果才能通过认证。实例值：“810_d”
 ```
