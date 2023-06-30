@@ -32,7 +32,7 @@ bash bin/unidbg-fetch-qsign --host=0.0.0.0 --port=8080  --count=2 --library=txli
 - --port=你的端口
  - --count=unidbg实例数量 (建议等于核心数) 【数值越大并发能力越强，内存占用越大】
  - --library=存放核心so文件的文件夹绝对路径
-- [--dynamic] 可选参数：是否开启动态引擎（加速Sign计算，有时候会出现[#52](https://github.com/fuqiuluo/unidbg-fetch-qsign/issues/52)）
+- [--dynamic] 可选参数：是否开启动态引擎, 默认关闭（加速Sign计算，有时候会出现[#52](https://github.com/fuqiuluo/unidbg-fetch-qsign/issues/52)）
 
 ## Docker部署
 
