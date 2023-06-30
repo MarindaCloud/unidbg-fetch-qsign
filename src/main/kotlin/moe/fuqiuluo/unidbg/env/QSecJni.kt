@@ -71,6 +71,10 @@ class QSecJni(
                     override fun onReceive(from: FromService?) {
                         if (from == null) return
                         println("Receive (${from.commandName}) Data => size = ${from.body.size} data: ${from.body.toHexString()}")
+                        if(from.commandName == "trpc.o3.ecdh_access.EcdhAccess.SsoEstablishShareKey") {
+                            QQSecuritySign.requestToken(this@QSecJni.vm)
+                        }
+
                         ChannelManager
                             .onNativeReceive(this@QSecJni.vm, from.commandName, from.body, callbackId)
                     }
@@ -278,7 +282,6 @@ class QSecJni(
             return vm
                 .resolveClass("java.io.File")
                 .newObject(File("/data/user/0/com.tencent.mobileqq/files"))
-                //.newObject(LinuxFile("/com.tencent.mobileqq/files", "/data/user/0/com.tencent.mobileqq"))
         }
         if (signature == "android/content/Context->getContentResolver()Landroid/content/ContentResolver;") {
             return vm.resolveClass("android/content/ContentResolver")

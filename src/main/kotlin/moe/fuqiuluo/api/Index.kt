@@ -14,6 +14,6 @@ data class APIResult<T>(val code: Int,
 
 fun Routing.configIndex() {
     get("/") {
-        call.respond("IAA")
+        call.respond("IAA 云天明")
     }
 }
