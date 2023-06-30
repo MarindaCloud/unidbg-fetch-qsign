@@ -27,8 +27,6 @@ object FEKit {
         ChannelManager.setChannelProxy(vm, vm.newInstance("com/tencent/mobileqq/channel/ChannelProxy"))
         ChannelManager.initReport(vm, QUA, CHANNEL_VERSION)
 
-        QQSecuritySign.requestToken(vm)
-
         QSec.doSomething(vm, context)
     }
 
