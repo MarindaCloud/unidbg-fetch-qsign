@@ -148,7 +148,7 @@ POST的内容："uin=" + uin + "&qua=" + qua + "&cmd=" + cmd + "&seq=" + seq + "
 
 ```kotlin
 # http://127.0.0.1:8080/energy?&version=[VERSION]&uin=[UIN]&guid=[GUID]&data=[DATA]
-[VERSION]：注意！这里的VERSION指的不是QQ的版本号，而是SDK Version，可以在QQ安装包中找到此信息
+[VERSION]：注意！这里的VERSION指的不是QQ的版本号，而是SDK Version，可以在QQ安装包中找到此信息。实例值：“6.0.0.2534”
 [UIN]：Bot的QQ号。实例值：“11451419198”
 [GUID]：密文，将byte数组转换为HEX发送，一般不会很长，不会超过GET上限。实例值：“0C099F0C099F0C099F”
 [DATA]：实际上是"mode"，QQ在运行时会随机挑选一个作为加密题目，要根据题目算出密文结果才能通过认证。实例值：“810_d”
