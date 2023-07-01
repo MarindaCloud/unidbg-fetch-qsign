@@ -4,6 +4,7 @@ import com.tencent.mobileqq.fe.FEKit
 import com.tencent.mobileqq.sign.QQSecuritySign
 import io.ktor.server.application.*
 import io.ktor.server.request.*
+import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.util.pipeline.*
 import kotlinx.serialization.Serializable
@@ -58,11 +59,11 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.requestSign(cmd: Stri
     if (sign == null) {
         failure(-1, "The instance is occupied and there are no idle instances")
     } else {
-        success(data = Sign(
+        call.respond(APIResult(0, "success", Sign(
             sign.token.toHexString(),
             sign.extra.toHexString(),
             sign.sign.toHexString(),
             o3did
-        ))
+        )))
     }
 }

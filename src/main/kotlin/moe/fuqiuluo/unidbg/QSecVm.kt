@@ -19,8 +19,8 @@ import javax.security.auth.Destroyable
 
 lateinit var workerPool: FixedWorkPool
 
-class QSecVMWorker(pool: WorkerPool, coreLibPath: File): Worker(pool) {
-    private val instance: QSecVM = QSecVM(coreLibPath)
+class QSecVMWorker(pool: WorkerPool, coreLibPath: File, isDynarmic: Boolean): Worker(pool) {
+    private val instance: QSecVM = QSecVM(coreLibPath, isDynarmic)
 
     fun <T> work(block: QSecVM.() -> T): T {
         return block.invoke(instance)
@@ -32,8 +32,8 @@ class QSecVMWorker(pool: WorkerPool, coreLibPath: File): Worker(pool) {
 }
 
 class QSecVM(
-    val coreLibPath: File
-): Destroyable, AndroidVM("com.tencent.mobileqq") {
+    val coreLibPath: File, isDynarmic: Boolean
+): Destroyable, AndroidVM("com.tencent.mobileqq", isDynarmic) {
     companion object {
         private val logger = LoggerFactory.getLogger(QSecVM::class.java)!!
     }
