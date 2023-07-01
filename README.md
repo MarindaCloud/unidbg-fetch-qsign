@@ -2,8 +2,6 @@
 
 获取QQSign参数通过Unidbg，开放HTTP API。unidbg-fetch-sign最低从QQ8.9.33（不囊括）开始支持，TIM不支持。
 
-> 多人使用请提高count值以提高并发量！！！
-
 # 切记
 
  - 公共API具有高风险可能
@@ -30,9 +28,11 @@ bash bin/unidbg-fetch-qsign --host=0.0.0.0 --port=8080  --count=2 --library=txli
 
 - --host=监听地址
 - --port=你的端口
- - --count=unidbg实例数量 (建议等于核心数) 【数值越大并发能力越强，内存占用越大】
- - --library=存放核心so文件的文件夹绝对路径
-- [--dynamic] 可选参数：是否开启动态引擎, 默认关闭（加速Sign计算，有时候会出现[#52](https://github.com/fuqiuluo/unidbg-fetch-qsign/issues/52)）
+- --count=unidbg实例数量 (建议等于核心数) 【数值越大并发能力越强，内存占用越大】<br>
+**多人使用请增加count的值以提高并发量！！！**
+- --library=存放核心so文件的文件夹绝对路径
+- --android_id=QQ客户端获取的安卓ID
+- --dynamic 可选参数：是否开启动态引擎, 默认关闭（加速Sign计算，有时候会出现[#52](https://github.com/fuqiuluo/unidbg-fetch-qsign/issues/52)）
 
 ## Docker部署
 
@@ -85,9 +85,15 @@ services:
 |SEQ|数据包序列号，用于指示请求的序列或顺序。它是一个用于跟踪请求的顺序的数值，确保请求按正确的顺序处理|1848698645|
 |BUFFER|数据包包体，不需要长度，将byte数组转换为HEX发送|0C099F0C099F0C099F|
 
-因为有些时候包体会过长，导致超出get的长度上限，因此sign支持POST  
-content-type为application/x-www-form-urlencoded  
-正文和GET写法格式一样："uin=" + qq + "&qua=" + qua + "&cmd=" + cmd + "&seq=" + seq + "&buffer=" + DataUtils.byteArrayToHex(buffer)  
+<details>
+<summary>POST的支持</summary>
+
+如果buffer过长，会超出get请求方式的长度上限，因此sign的请求也支持POST的方式。
+
+请求头 `Content-Type: application/x-www-form-urlencoded`
+
+POST的内容："uin=" + uin + "&qua=" + qua + "&cmd=" + cmd + "&seq=" + seq + "&buffer=" + buffer
+</details>
 
 ### 登录包energy(tlv544)
 
@@ -98,7 +104,10 @@ content-type为application/x-www-form-urlencoded
 ```
 |参数名|意义|例子|
 |-----|-----|-----|
-|VERSION|**注意！**这里的VERSION指的**不是QQ的版本号，而是SDK Version**，可以在QQ安装包中找到此信息|6.0.0.2534|
-|UIN|Bot的QQ号|11451419198|
+|VERSION|**注意！**这里的VERSION指的**不是QQ的版本号，而是SDK Version**，可以在QQ安装包中找到此信息|6.0.0.2549|
+|UIN|Bot的QQ号|114514|
 |GUID|登录设备的GUID，将byte数组转换为HEX发送，必须是32长度的HEX字符串|ABCDABCDABCDABCDABCDABCDABCDABCD|
-|DATA|QQ发送登录包的CmdId和SubCmdId，例子中810是登陆CmdId，d是SubCmdId|810_d|
+|DATA|QQ发送登录包的CmdId和SubCmdId，例子中810是登陆CmdId，9是SubCmdId|810_9|
+
+# 其他
+- 由于项目的特殊性，我们可能~~随时删除本项目~~且不会做出任何声明
