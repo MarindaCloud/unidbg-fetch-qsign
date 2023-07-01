@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "moe.fuqiuluo"
-version = "1.1.0"
+version = System.getenv("RELEASE_VERSION")
 
 repositories {
     mavenCentral()
@@ -40,4 +40,14 @@ kotlin {
 
 application {
     mainClass.set("MainKt")
+}
+
+distributions {
+    main {
+        contents {
+            from(".") {
+                include("txlib/**")
+            }
+        }
+    }
 }
