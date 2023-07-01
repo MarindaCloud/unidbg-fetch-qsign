@@ -2,6 +2,8 @@ package moe.fuqiuluo.api
 
 import com.tencent.crypt.Crypt
 import com.tencent.mobileqq.qsec.qsecdandelionsdk.Dandelion
+import io.ktor.server.application.*
+import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import moe.fuqiuluo.ext.*
 import moe.fuqiuluo.unidbg.pool.work
@@ -20,7 +22,7 @@ fun Routing.configEnergy() {
         if (sign == null) {
             failure(-1, "The instance is occupied and there are no idle instances")
         } else {
-            success(data = sign.toHexString())
+            call.respond(APIResult(0, "success", sign.toHexString()))
         }
     }
 
@@ -32,7 +34,7 @@ fun Routing.configEnergy() {
 
         val mode = fetchGet("mode", def = when(data) {
             "810_d", "810_a", "810_f", "810_9" -> "v2"
-            "810_25", "810_7", "810_24" -> "v1"
+            "810_2", "810_25", "810_7", "810_24" -> "v1"
             "812_a" -> "v3"
             "812_5" -> "v4"
             else -> ""
@@ -108,7 +110,7 @@ fun Routing.configEnergy() {
         if (sign == null) {
             failure(-1, "The instance is occupied and there are no idle instances")
         } else {
-            success(data = sign.toHexString())
+            call.respond(APIResult(0, "success", sign.toHexString()))
         }
     }
 }

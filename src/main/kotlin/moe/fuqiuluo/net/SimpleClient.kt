@@ -47,7 +47,7 @@ class SimpleClient(
         this.readChannel = socket.openReadChannel()
         this.writeChannel = socket.openWriteChannel(true)
 
-        GlobalScope.launch(Dispatchers.IO) {
+        selectorManager.launch(Dispatchers.IO) {
             while (!readChannel.isClosedForRead) {
                 val length = readChannel.readInt() - 4
                 if (length > 10 * 1024 * 1024 || length <= 0) error(
@@ -59,8 +59,8 @@ class SimpleClient(
                 }
             }
         }
-        GlobalScope.launch(Dispatchers.IO) {
-            while (true) {
+        selectorManager.launch(Dispatchers.IO) {
+            while (!writeChannel.isClosedForWrite) {
                 packetList.forEach {
                     writeChannel.encode(it)
                     packetList.remove(it)
@@ -83,5 +83,6 @@ class SimpleClient(
 
     override fun close() {
         socket.close()
+        selectorManager.close()
     }
 }

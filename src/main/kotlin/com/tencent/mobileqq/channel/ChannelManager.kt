@@ -10,7 +10,7 @@ object ChannelManager {
     }
 
     fun initReport(vm: QSecVM, qua: String, version: String, androidOs: String = "12", brand: String = "Redmi", model: String = "23013RK75C",
-                   qimei36: String = "", guid: String = "35bf20e2a3e25bf715479d6ab76b146d") {
+                   qimei36: String = "", guid: String = "") {
         vm.newInstance("com/tencent/mobileqq/channel/ChannelManager", unique = true)
             .callJniMethod(vm.emulator, "initReport(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
                 qua, version, androidOs, brand + model, qimei36, guid
