@@ -102,6 +102,8 @@ services:
 
 # 使用API
 
+## [初始化QSign&刷新token](https://github.com/fuqiuluo/unidbg-fetch-qsign/blob/master/refresh_token/README.md)
+
 ### 原始energy
 
 ```kotlin
