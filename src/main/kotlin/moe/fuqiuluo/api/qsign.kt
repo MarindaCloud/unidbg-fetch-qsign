@@ -57,12 +57,8 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.requestSign(cmd: Stri
 
     val list = arrayListOf<SsoPacket>()
     lateinit var o3did: String
-    
-    val sign = session.withLock {
-        if (session.step != SignStep.Step3) {
-            (vm.global["mutex"] as Mutex).lock()
-        }
 
+    val sign = session.withLock {
         QQSecuritySign.getSign(vm, qua, cmd, buffer, seq, uin).value.also {
             o3did = vm.global["o3did"] as? String ?: ""
             val requiredPacket = vm.global["PACKET"] as ArrayList<SsoPacket>
