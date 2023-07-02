@@ -62,13 +62,8 @@ class QSecJni(
             if (callbackId == -1L) return
 
             println("uin = ${global["uin"]}, id = $callbackId, sendPacket(cmd = $cmd, data = $hex)")
-            if (cmd == "trpc.o3.ecdh_access.EcdhAccess.SsoEstablishShareKey" || "trpc.o3.ecdh_access.EcdhAccess.SsoSecureA2Establish" == cmd) {
-                (global["PACKET"] as ArrayList<SsoPacket>)
-                    .add(SsoPacket(cmd, hex, callbackId))
-                (global["mutex"] as Mutex).also {
-                    if(it.isLocked) it.unlock()
-                }
-            }
+            (global["PACKET"] as ArrayList<SsoPacket>).add(SsoPacket(cmd, hex, callbackId))
+            (global["mutex"] as Mutex).also { if(it.isLocked) it.unlock() }
             return
         }
 
@@ -77,6 +72,7 @@ class QSecJni(
             global["o3did"] = o3did
             return
         }
+
         super.callVoidMethodV(vm, dvmObject, signature, vaList)
     }
 

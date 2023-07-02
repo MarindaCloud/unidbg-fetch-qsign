@@ -64,6 +64,9 @@ bash bin/unidbg-fetch-qsign --basePath=txlib\8.9.63
 >     - libfekit.so<br>
 >     - libQSec.so<br>
 >     - config.json<br>
+>     - dtconfig.json<br>
+
+> ```dtconfig.json```是FEBound.java内数据的热更新版本，每个版本的QQ不同，可自行从```com.tencent.mobileqq.dt.model.FEBound```逆向得到。
 
 > --basePath=`/home/your_dir`
 

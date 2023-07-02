@@ -1,3 +1,4 @@
+import com.tencent.mobileqq.dt.model.FEBound
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -36,12 +37,14 @@ fun main(args: Array<String>) {
             !baseDir.resolve("libfekit.so").exists() ||
             !baseDir.resolve("libQSec.so").exists() ||
             !baseDir.resolve("config.json").exists()
+            || !baseDir.resolve("dtconfig.json").exists()
         ) {
             error("The base path is invalid, perhaps it is not a directory or something is missing inside.")
         } else {
             Json {
                 ignoreUnknownKeys = true
             }
+            FEBound.initAssertConfig(baseDir)
             CONFIG = Json.decodeFromString<QSignConfig>(baseDir.resolve("config.json").readText())
                 .apply { checkIllegal() }
         }
