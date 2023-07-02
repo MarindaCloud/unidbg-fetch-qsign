@@ -13,10 +13,9 @@
   ],
   "reload_interval": 40,
   "protocol": {
-    "sub_app_id": 537164840,
-    "qua": "V1_AND_SQ_8.9.63_4194_YYB_D",
-    "version": "8.9.63",
-    "code": "4194"
+    "qua": "V1_AND_SQ_8.9.68_4218_HDBM_T",
+    "version": "8.9.68",
+    "code": "4218"
   },
   "unidbg": {
     "dynarmic": false,

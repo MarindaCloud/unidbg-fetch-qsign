@@ -1,24 +1,37 @@
 package moe.fuqiuluo.api
 
+import com.tencent.crypt.Crypt
+import com.tencent.mobileqq.qsec.qsecdandelionsdk.Dandelion
+import io.ktor.server.application.*
+import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import moe.fuqiuluo.ext.failure
+import moe.fuqiuluo.ext.fetchGet
+import moe.fuqiuluo.ext.hex2ByteArray
+import moe.fuqiuluo.ext.toHexString
+import moe.fuqiuluo.utils.EMPTY_BYTE_ARRAY
+import moe.fuqiuluo.utils.MD5
+import java.nio.ByteBuffer
 
-fun Routing.configEnergy() {
-    /*
+fun Routing.energy() {
     get("/custom_energy") {
-        val data = fetchGet("data", err = "lack of data") ?: return@get
-        val salt = (fetchGet("salt", err = "lack of salt") ?: return@get).hex2ByteArray()
-        val sign = workerPool.work {
-            Dandelion.energy(this, data, salt)
+        val uin = fetchGet("uin")!!.toLong()
+        val data = fetchGet("data")!!
+        val salt = fetchGet("salt")!!.hex2ByteArray()
+
+        val session = findSession(uin)
+
+        val sign = session.withLock {
+            Dandelion.energy(session.vm, data, salt)
         }
-        if (sign == null) {
-            failure(-1, "The instance is occupied and there are no idle instances")
-        } else {
-            call.respond(APIResult(0, "success", sign.toHexString()))
-        }
+        call.respond(APIResult(0, "success", sign.toHexString()))
     }
 
     get("/energy") {
-        val data = fetchGet("data", err = "lack of data") ?: return@get
+        val uin = fetchGet("uin")!!.toLong()
+        val session = findSession(uin)
+
+        val data = fetchGet("data")!!
         if(!(data.startsWith("810_") || data.startsWith("812_"))) {
             failure(-2, "data参数不合法")
         }
@@ -94,14 +107,10 @@ fun Routing.configEnergy() {
             }
         }
 
-        val sign = workerPool.work {
-            Dandelion.energy(this, data, salt)
+        val sign = session.withLock {
+            Dandelion.energy(session.vm, data, salt)
         }
 
-        if (sign == null) {
-            failure(-1, "The instance is occupied and there are no idle instances")
-        } else {
-            call.respond(APIResult(0, "success", sign.toHexString()))
-        }
-    }*/
+        call.respond(APIResult(0, "success", sign.toHexString()))
+    }
 }

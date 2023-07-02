@@ -22,7 +22,8 @@ lateinit var BASE_PATH: File
 
 private val API_LIST = arrayOf(
     Routing::index,
-    Routing::queryStatus
+    Routing::sign,
+    Routing::energy
 )
 
 fun main(args: Array<String>) {

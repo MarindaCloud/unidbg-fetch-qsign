@@ -1,3 +1,4 @@
+@file:Suppress("UNCHECKED_CAST")
 package moe.fuqiuluo.unidbg.env
 
 import CONFIG
@@ -14,6 +15,7 @@ import moe.fuqiuluo.unidbg.vm.GlobalData
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.util.*
+import kotlin.collections.ArrayList
 
 private val logger = LoggerFactory.getLogger(QSecJni::class.java)
 
@@ -61,8 +63,11 @@ class QSecJni(
 
             println("uin = ${global["uin"]}, id = $callbackId, sendPacket(cmd = $cmd, data = $hex)")
             if (cmd == "trpc.o3.ecdh_access.EcdhAccess.SsoEstablishShareKey" || "trpc.o3.ecdh_access.EcdhAccess.SsoSecureA2Establish" == cmd) {
-                global["PACKET"] = SsoPacket(cmd, hex, callbackId)
-                (global["mutex"] as Mutex).unlock()
+                (global["PACKET"] as ArrayList<SsoPacket>)
+                    .add(SsoPacket(cmd, hex, callbackId))
+                (global["mutex"] as Mutex).also {
+                    if(it.isLocked) it.unlock()
+                }
             }
             return
         }
