@@ -15,7 +15,9 @@ data class Server(
 data class UinData(
     var uin: Long,
     @JsonNames("androidId", "android_id", "imei")
-    var androidId: String
+    var androidId: String,
+    var guid: String,
+    var qimei36: String
 )
 
 @Serializable

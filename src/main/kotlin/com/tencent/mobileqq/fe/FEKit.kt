@@ -9,15 +9,17 @@ import com.tencent.mobileqq.sign.QQSecuritySign
 import moe.fuqiuluo.unidbg.QSecVM
 
 object FEKit {
-    fun init(vm: QSecVM) {
+    fun init(vm: QSecVM, uin: String = "0") {
         if ("fekit" in vm.global) return
+        vm.global["uin"] = uin
+
         QQSecuritySign.initSafeMode(vm, false)
-        QQSecuritySign.dispatchEvent(vm, "Kicked", "0")
+        QQSecuritySign.dispatchEvent(vm, "Kicked", uin)
 
         val context = vm.newInstance("android/content/Context", unique = true)
         Dtn.initContext(vm, context)
         Dtn.initLog(vm, vm.newInstance("com/tencent/mobileqq/fe/IFEKitLog"))
-        Dtn.initUin(vm, "0")
+        Dtn.initUin(vm, uin)
 
         if ("DeepSleepDetector" !in vm.global) {
             vm.global["DeepSleepDetector"] = DeepSleepDetector()

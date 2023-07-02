@@ -3,23 +3,33 @@ import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.plugins.statuspages.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.json.Json
-import moe.fuqiuluo.api.configEnergy
-import moe.fuqiuluo.api.configIndex
-import moe.fuqiuluo.api.configSign
+import moe.fuqiuluo.api.*
 import moe.fuqiuluo.comm.QSignConfig
 import moe.fuqiuluo.comm.checkIllegal
 import moe.fuqiuluo.comm.invoke
 import org.slf4j.LoggerFactory
 import java.io.File
 
+
 private val logger = LoggerFactory.getLogger(Main::class.java)
 lateinit var CONFIG: QSignConfig
+lateinit var BASE_PATH: File
+
+private val API_LIST = arrayOf(
+    Routing::index,
+    Routing::queryStatus
+)
 
 fun main(args: Array<String>) {
     args().also {
-        val baseDir = File(it["basePath", "Lack of basePath."])
+        val baseDir = File(it["basePath", "Lack of basePath."]).also {
+            BASE_PATH = it
+        }
         if (!baseDir.exists() ||
             !baseDir.isDirectory ||
             !baseDir.resolve("libfekit.so").exists() ||
@@ -49,9 +59,15 @@ fun Application.init() {
             isLenient = true
         })
     }
+    install(StatusPages) {
+        exception<Throwable> { call, cause ->
+            if (CONFIG.unidbg.debug) {
+                cause.printStackTrace()
+            }
+            call.respond(APIResult(1, cause.message ?: cause.javaClass.name, call.request.uri))
+        }
+    }
     routing {
-        configIndex()
-        configEnergy()
-        configSign()
+        API_LIST.forEach { it(this) }
     }
 }
