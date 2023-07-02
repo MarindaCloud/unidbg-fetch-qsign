@@ -5,8 +5,14 @@ import moe.fuqiuluo.unidbg.QSecVM
 
 object Dtn {
     fun initContext(vm: QSecVM, context: DvmObject<*>) {
-        vm.newInstance("com/tencent/mobileqq/dt/Dtn", unique = true)
-            .callJniMethod(vm.emulator, "initContext(Landroid/content/Context;)V", context)
+        runCatching {
+            vm.newInstance("com/tencent/mobileqq/dt/Dtn", unique = true)
+                .callJniMethod(vm.emulator, "initContext(Landroid/content/Context;)V", context)
+        }.onFailure {
+            vm.newInstance("com/tencent/mobileqq/dt/Dtn", unique = true)
+                .callJniMethod(vm.emulator, "initContext(Landroid/content/Context;Ljava/lang/String;)V",
+                    context, "/data/user/0/com.tencent.mobileqq/files/5463306EE50FE3AA")
+        }
     }
 
     fun initLog(vm: QSecVM, logger: DvmObject<*>) {

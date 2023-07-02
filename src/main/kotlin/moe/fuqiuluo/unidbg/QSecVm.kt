@@ -1,12 +1,9 @@
-@file:OptIn(DelicateCoroutinesApi::class)
 package moe.fuqiuluo.unidbg
 
 import com.github.unidbg.linux.android.dvm.DvmObject
+import com.tencent.mobileqq.qsec.qsecurity.DeepSleepDetector
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import moe.fuqiuluo.comm.UinData
-import moe.fuqiuluo.net.SimpleClient
 import moe.fuqiuluo.unidbg.env.FileResolver
 import moe.fuqiuluo.unidbg.env.QSecJni
 import moe.fuqiuluo.unidbg.vm.AndroidVM
@@ -18,7 +15,7 @@ import kotlin.system.exitProcess
 
 class QSecVM(
     val coreLibPath: File,
-    uinData: UinData,
+    val uinData: UinData,
     dynarmic: Boolean,
     unicorn: Boolean
 ): Destroyable, AndroidVM("com.tencent.mobileqq", dynarmic, unicorn) {
@@ -29,14 +26,13 @@ class QSecVM(
     private var destroy: Boolean = false
     private var isInit: Boolean = false
     internal val global = GlobalData()
-    private val client = SimpleClient("msfwifi.3g.qq.com", 8080)
 
     init {
         runCatching {
             val resolver = FileResolver(23, this@QSecVM)
             memory.setLibraryResolver(resolver)
             emulator.syscallHandler.addIOResolver(resolver)
-            vm.setJni(QSecJni(uinData, this, client, global))
+            vm.setJni(QSecJni(uinData, this, global))
         }.onFailure {
             it.printStackTrace()
         }
@@ -45,12 +41,9 @@ class QSecVM(
     fun init() {
         if (isInit) return
         runCatching {
-            GlobalScope.launch {
-                client.connect()
-                client.initConnection()
-            }
             loadLibrary(coreLibPath.resolve("libQSec.so"))
             loadLibrary(coreLibPath.resolve("libfekit.so"))
+            global["DeepSleepDetector"] = DeepSleepDetector()
             this.isInit = true
         }.onFailure {
             it.printStackTrace()
@@ -74,7 +67,6 @@ class QSecVM(
     override fun destroy() {
         if (isDestroyed) return
         this.destroy = true
-        this.client.close()
         this.close()
     }
 }

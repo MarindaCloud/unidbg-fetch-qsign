@@ -2,8 +2,6 @@
 
 获取QQSign参数通过Unidbg，开放HTTP API。unidbg-fetch-sign最低从QQ8.9.33（不囊括）开始支持，TIM不支持。
 
-> 多人使用请提高count值以提高并发量！！！
-
 # 切记
 
  - 公共API具有高风险可能
@@ -32,7 +30,10 @@
       // uin也就是你的QQQ
       "uin": 114514,
       // 该uin对应的android_id
-      "android_id": ""
+      "android_id": "1145141919810114",
+      // 不能是空的哦~~
+      "guid":       "5141919810114514",
+      "qimei36":    "8e11b1f9764fa3b43121f6f510001fa1721a"
     }
   ],
   // 实例重载间隔

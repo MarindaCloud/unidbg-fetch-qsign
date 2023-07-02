@@ -2,16 +2,13 @@ package moe.fuqiuluo.unidbg.env
 
 import CONFIG
 import com.github.unidbg.linux.android.dvm.*
-import com.tencent.mobileqq.channel.ChannelManager
+import com.tencent.mobileqq.channel.SsoPacket
 import com.tencent.mobileqq.dt.model.FEBound
 import com.tencent.mobileqq.qsec.qsecurity.DeepSleepDetector
 import com.tencent.mobileqq.sign.QQSecuritySign
+import kotlinx.coroutines.sync.Mutex
 import moe.fuqiuluo.comm.UinData
 import moe.fuqiuluo.ext.toHexString
-import moe.fuqiuluo.net.FromService
-import moe.fuqiuluo.net.OnPacketListener
-import moe.fuqiuluo.net.SimpleClient
-import moe.fuqiuluo.net.SsoPacket
 import moe.fuqiuluo.unidbg.QSecVM
 import moe.fuqiuluo.unidbg.vm.GlobalData
 import org.slf4j.LoggerFactory
@@ -25,7 +22,6 @@ typealias BytesObject = com.github.unidbg.linux.android.dvm.array.ByteArray
 class QSecJni(
     val uinData: UinData,
     val vm: QSecVM,
-    val client: SimpleClient,
     val global: GlobalData
 ) : AbstractJni() {
     override fun getStaticIntField(vm: BaseVM, dvmClass: DvmClass, signature: String): Int {
@@ -59,28 +55,14 @@ class QSecJni(
             val cmd = vaList.getObjectArg<StringObject>(0).value
             val data = vaList.getObjectArg<BytesObject>(1).value
             val callbackId = vaList.getLongArg(2)
+            val hex = data.toHexString()
 
-            println("uin = ${global["uin"]}, id = $callbackId, sendPacket(cmd = $cmd, data = ${data.toHexString()})")
+            if (callbackId == -1L) return
 
-            if (cmd == "trpc.o3.ecdh_access.EcdhAccess.SsoEstablishShareKey"
-                // || cmd == "trpc.o3.report.Report.SsoReport"
-                //|| cmd == "trpc.o3.ecdh_access.EcdhAccess.SsoSecureA2Access"
-                ) {
-                val seq = client.nextSeq()
-                if (callbackId != (-1).toLong()) client.register(cmd, seq).async(dataListener = object: OnPacketListener {
-                    override fun onReceive(from: FromService?) {
-                        if (from == null) return
-                        println("Receive (${from.commandName}) Data => size = ${from.body.size} data: ${from.body.toHexString()}")
-                        if(from.commandName == "trpc.o3.ecdh_access.EcdhAccess.SsoEstablishShareKey") {
-                            QQSecuritySign.requestToken(this@QSecJni.vm)
-                        }
-
-                        ChannelManager
-                            .onNativeReceive(this@QSecJni.vm, from.commandName, from.body, callbackId)
-                    }
-                })
-                client.sendPacket(SsoPacket(cmd, seq, data, if ("uin" in global) global["uin"] as String else "0"))
-                //client.sendPacket(SsoPacket(cmd, seq, data, "0"))
+            println("uin = ${global["uin"]}, id = $callbackId, sendPacket(cmd = $cmd, data = $hex)")
+            if (cmd == "trpc.o3.ecdh_access.EcdhAccess.SsoEstablishShareKey" || "trpc.o3.ecdh_access.EcdhAccess.SsoSecureA2Establish" == cmd) {
+                global["PACKET"] = SsoPacket(cmd, hex, callbackId)
+                (global["mutex"] as Mutex).unlock()
             }
             return
         }
@@ -91,6 +73,28 @@ class QSecJni(
             return
         }
         super.callVoidMethodV(vm, dvmObject, signature, vaList)
+    }
+
+    override fun getStaticObjectField(vm: BaseVM, dvmClass: DvmClass, signature: String): DvmObject<*> {
+        if (signature == "com/tencent/mobileqq/qsec/qsecurity/QSecConfig->business_uin:Ljava/lang/String;") {
+            return StringObject(vm, global["uin"] as String)
+        }
+        if (signature == "com/tencent/mobileqq/qsec/qsecurity/QSecConfig->business_seed:Ljava/lang/String;") {
+            return StringObject(vm, global["seed"] as? String ?: "")
+        }
+        if (signature == "com/tencent/mobileqq/qsec/qsecurity/QSecConfig->business_guid:Ljava/lang/String;") {
+            return StringObject(vm, global["guid"] as? String ?: "")
+        }
+        if (signature == "com/tencent/mobileqq/qsec/qsecurity/QSecConfig->business_o3did:Ljava/lang/String;") {
+            return StringObject(vm, global["o3did"] as? String ?: "")
+        }
+        if (signature == "com/tencent/mobileqq/qsec/qsecurity/QSecConfig->business_q36:Ljava/lang/String;") {
+            return StringObject(vm, global["qimei36"] as? String ?: "")
+        }
+        if (signature == "com/tencent/mobileqq/qsec/qsecurity/QSecConfig->business_qua:Ljava/lang/String;") {
+            return StringObject(vm, CONFIG.protocol.qua)
+        }
+        return super.getStaticObjectField(vm, dvmClass, signature)
     }
 
     override fun getObjectField(vm: BaseVM, dvmObject: DvmObject<*>, signature: String): DvmObject<*> {
@@ -147,7 +151,7 @@ class QSecJni(
         if (signature == "android/provider/Settings\$System->getString(Landroid/content/ContentResolver;Ljava/lang/String;)Ljava/lang/String;") {
             val key = vaList.getObjectArg<StringObject>(1).value
             if (key == "android_id") {
-                return StringObject(vm, uinData.androidId)
+                return StringObject(vm, uinData.androidId.lowercase())
             }
         }
         if (signature == "com/tencent/mobileqq/fe/utils/DeepSleepDetector->getCheckResult()Ljava/lang/String;") {

@@ -12,6 +12,7 @@ import moe.fuqiuluo.ext.hex2ByteArray
 import moe.fuqiuluo.unidbg.QSecVM
 import moe.fuqiuluo.unidbg.env.files.fetchStat
 import moe.fuqiuluo.unidbg.env.files.fetchStatus
+import java.io.File
 import java.util.logging.Logger
 
 class FileResolver(
@@ -29,6 +30,13 @@ class FileResolver(
     }
 
     private fun resolve(emulator: Emulator<AndroidFileIO>, path: String, oflags: Int, def: FileResult<AndroidFileIO>?): FileResult<AndroidFileIO>? {
+        if (path == "stdin" || path == "stdout" || path == "stderr") {
+            return FileResult.success(SimpleFileIO(oflags, tmpFilePath.resolve(path).also {
+                if (!it.exists()) it.createNewFile()
+            }, path))
+        }
+
+
         if (path == "/proc/self/status") {
             return FileResult.success(ByteArrayFileIO(oflags, path, fetchStatus(emulator.pid).toByteArray()))
         }
@@ -97,7 +105,7 @@ class FileResolver(
             }
         }
 
-        if (path.contains(".system_android_l2")) {
+        if (path.contains("system_android_l2") || path.contains("android_lq")) {
             val newPath = if (path.startsWith("C:")) path.substring(2) else path
             val file = tmpFilePath.resolve(".system_android_l2")
             if (!file.exists()) {

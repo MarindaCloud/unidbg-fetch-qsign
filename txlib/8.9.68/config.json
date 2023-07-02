@@ -6,7 +6,9 @@
   "uin_list": [
     {
       "uin": 114514,
-      "android_id": ""
+      "android_id": "1145141919810114",
+      "guid":       "5141919810114514",
+      "qimei36":    "8e11b1f9764fa3b43121f6f510001fa1721a"
     }
   ],
   "reload_interval": 40,
@@ -19,6 +21,6 @@
   "unidbg": {
     "dynarmic": false,
     "unicorn": true,
-    "debug": false
+    "debug": true
   }
 }
