@@ -1,7 +1,6 @@
 package com.tencent.mobileqq.fe
 
-import CHANNEL_VERSION
-import QUA
+import CONFIG
 import com.tencent.mobileqq.channel.ChannelManager
 import com.tencent.mobileqq.dt.Dtn
 import com.tencent.mobileqq.qsec.qsecurity.DeepSleepDetector
@@ -25,7 +24,7 @@ object FEKit {
         }
 
         ChannelManager.setChannelProxy(vm, vm.newInstance("com/tencent/mobileqq/channel/ChannelProxy"))
-        ChannelManager.initReport(vm, QUA, CHANNEL_VERSION)
+        ChannelManager.initReport(vm, CONFIG.protocol.qua, "6.100.248") // TODO(maybe check?)
 
         QSec.doSomething(vm, context)
     }

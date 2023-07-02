@@ -1,18 +1,9 @@
 package moe.fuqiuluo.api
 
-import com.tencent.crypt.Crypt
-import com.tencent.mobileqq.qsec.qsecdandelionsdk.Dandelion
-import io.ktor.server.application.*
-import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import moe.fuqiuluo.ext.*
-import moe.fuqiuluo.unidbg.pool.work
-import moe.fuqiuluo.unidbg.workerPool
-import moe.fuqiuluo.utils.EMPTY_BYTE_ARRAY
-import moe.fuqiuluo.utils.MD5
-import java.nio.ByteBuffer
 
 fun Routing.configEnergy() {
+    /*
     get("/custom_energy") {
         val data = fetchGet("data", err = "lack of data") ?: return@get
         val salt = (fetchGet("salt", err = "lack of salt") ?: return@get).hex2ByteArray()
@@ -112,5 +103,5 @@ fun Routing.configEnergy() {
         } else {
             call.respond(APIResult(0, "success", sign.toHexString()))
         }
-    }
+    }*/
 }

@@ -2,7 +2,6 @@
 
 package moe.fuqiuluo.net
 
-import QUA
 import com.tencent.crypt.Crypt
 import com.tencent.mobileqq.sign.QQSecuritySign
 import io.ktor.utils.io.*
@@ -13,8 +12,6 @@ import kotlinx.serialization.encodeToByteArray
 import kotlinx.serialization.protobuf.ProtoBuf
 import kotlinx.serialization.protobuf.ProtoNumber
 import moe.fuqiuluo.ext.*
-import moe.fuqiuluo.unidbg.pool.work
-import moe.fuqiuluo.unidbg.workerPool
 import moe.fuqiuluo.utils.BytesUtil
 import moe.fuqiuluo.utils.EMPTY_BYTE_ARRAY
 import java.util.*
@@ -100,6 +97,7 @@ private fun buildData(ssoPacket: SsoPacket) = newBuilder().apply {
             this.writeString(it)
         }
 
+        /* TODO
         val sign = workerPool.work {
             QQSecuritySign.getSign(this,
                 QUA,
@@ -133,7 +131,7 @@ private fun buildData(ssoPacket: SsoPacket) = newBuilder().apply {
         }).let {
             this.writeInt(it.size + 4)
             this.writeBytes(it)
-        }
+        }*/
     }
 
     this.writeBlockWithIntLen({ it + 4 }) {
