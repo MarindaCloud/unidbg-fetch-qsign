@@ -13,18 +13,17 @@ import moe.fuqiuluo.api.*
 import moe.fuqiuluo.comm.QSignConfig
 import moe.fuqiuluo.comm.checkIllegal
 import moe.fuqiuluo.comm.invoke
-import org.slf4j.LoggerFactory
 import java.io.File
 
-
-private val logger = LoggerFactory.getLogger(Main::class.java)
 lateinit var CONFIG: QSignConfig
 lateinit var BASE_PATH: File
 
 private val API_LIST = arrayOf(
     Routing::index,
     Routing::sign,
-    Routing::energy
+    Routing::energy,
+    Routing::submit,
+    Routing::requestToken
 )
 
 fun main(args: Array<String>) {
