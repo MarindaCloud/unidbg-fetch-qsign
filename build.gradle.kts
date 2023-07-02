@@ -53,3 +53,13 @@ distributions {
         }
     }
 }
+
+distributions {
+    main {
+        contents {
+            from(".") {
+                include("txlib/**")
+            }
+        }
+    }
+}
