@@ -9,8 +9,6 @@ import io.ktor.server.routing.*
 import io.ktor.util.pipeline.*
 import kotlinx.serialization.Serializable
 import moe.fuqiuluo.ext.*
-import moe.fuqiuluo.unidbg.pool.work
-import moe.fuqiuluo.unidbg.workerPool
 
 @Serializable
 private data class Sign(
@@ -47,7 +45,7 @@ fun Routing.configSign() {
 }
 
 private suspend fun PipelineContext<Unit, ApplicationCall>.requestSign(cmd: String, uin: String, qua: String, seq: Int, buffer: ByteArray, qimei36: String) {
-    var o3did = ""
+    /*var o3did = ""
     val sign = workerPool.work {
         global["qimei36"] = qimei36
         FEKit.changeUin(this, uin)
@@ -65,5 +63,5 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.requestSign(cmd: Stri
             sign.sign.toHexString(),
             o3did
         )))
-    }
+    }*/
 }

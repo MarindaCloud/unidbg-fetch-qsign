@@ -1,13 +1,12 @@
 package moe.fuqiuluo.unidbg.env
 
-import ANDROID_ID
-import QQ_CODE
-import QQ_VERSION
+import CONFIG
 import com.github.unidbg.linux.android.dvm.*
 import com.tencent.mobileqq.channel.ChannelManager
 import com.tencent.mobileqq.dt.model.FEBound
 import com.tencent.mobileqq.qsec.qsecurity.DeepSleepDetector
 import com.tencent.mobileqq.sign.QQSecuritySign
+import moe.fuqiuluo.comm.UinData
 import moe.fuqiuluo.ext.toHexString
 import moe.fuqiuluo.net.FromService
 import moe.fuqiuluo.net.OnPacketListener
@@ -24,6 +23,7 @@ private val logger = LoggerFactory.getLogger(QSecJni::class.java)
 typealias BytesObject = com.github.unidbg.linux.android.dvm.array.ByteArray
 
 class QSecJni(
+    val uinData: UinData,
     val vm: QSecVM,
     val client: SimpleClient,
     val global: GlobalData
@@ -139,7 +139,7 @@ class QSecJni(
                 "DeviceToken-MODEL-XX-V001" -> ""
                 "DeviceToken-ANDROID-ID-V001" -> ""
                 "DeviceToken-qimei36-V001" -> global["qimei36"] as? String ?: ""
-                "MQQ_SP_DEVICETOKEN_DID_DEVICEIDUUID_202207072241" -> UUID.randomUUID().toString() + "|" + QQ_VERSION
+                "MQQ_SP_DEVICETOKEN_DID_DEVICEIDUUID_202207072241" -> UUID.randomUUID().toString() + "|" + CONFIG.protocol.version
                 "DeviceToken-APN-V001", "DeviceToken-TuringCache-V001", "DeviceToken-MAC-ADR-V001", "DeviceToken-wifissid-V001" -> "-1"
                 else -> error("Not support mmKVValue:$key")
             })
@@ -147,7 +147,7 @@ class QSecJni(
         if (signature == "android/provider/Settings\$System->getString(Landroid/content/ContentResolver;Ljava/lang/String;)Ljava/lang/String;") {
             val key = vaList.getObjectArg<StringObject>(1).value
             if (key == "android_id") {
-                return StringObject(vm, ANDROID_ID)
+                return StringObject(vm, uinData.androidId)
             }
         }
         if (signature == "com/tencent/mobileqq/fe/utils/DeepSleepDetector->getCheckResult()Ljava/lang/String;") {
@@ -201,13 +201,13 @@ class QSecJni(
         }
         if (signature == "com/tencent/mobileqq/dt/app/Dtc->getAppVersionName(Ljava/lang/String;)Ljava/lang/String;") {
             return StringObject(vm, when(val key = vaList.getObjectArg<StringObject>(0).value) {
-                "empty" -> QQ_VERSION
+                "empty" -> CONFIG.protocol.version
                 else -> error("Not support getAppVersionName:$key")
             })
         }
         if (signature == "com/tencent/mobileqq/dt/app/Dtc->getAppVersionCode(Ljava/lang/String;)Ljava/lang/String;") {
             return StringObject(vm, when(val key = vaList.getObjectArg<StringObject>(0).value) {
-                "empty" -> QQ_CODE
+                "empty" -> CONFIG.protocol.code
                 else -> error("Not support getAppVersionCode:$key")
             })
         }

@@ -1,37 +1,31 @@
 package moe.fuqiuluo.unidbg.vm
 
+import CONFIG
 import com.github.unidbg.arm.backend.DynarmicFactory
-import com.github.unidbg.arm.backend.HypervisorFactory
-import com.github.unidbg.arm.backend.KvmFactory
-import com.github.unidbg.linux.LinuxModule
-import com.github.unidbg.linux.LinuxSymbol
+import com.github.unidbg.arm.backend.Unicorn2Factory
 import com.github.unidbg.linux.android.AndroidEmulatorBuilder
 import com.github.unidbg.linux.android.dvm.DalvikModule
 import com.github.unidbg.linux.android.dvm.DvmClass
 import com.github.unidbg.virtualmodule.android.AndroidModule
-import debug
 import java.io.Closeable
 import java.io.File
-import java.util.Arrays
 
-open class AndroidVM(packageName: String, isDynarmic: Boolean): Closeable {
+open class AndroidVM(packageName: String, dynarmic: Boolean, unicorn: Boolean): Closeable {
     internal val emulator = AndroidEmulatorBuilder
         .for64Bit()
         .setProcessName(packageName)
         .apply {
-            if (isDynarmic) addBackendFactory(DynarmicFactory(true))
+            if (dynarmic) addBackendFactory(DynarmicFactory(true))
+            if (unicorn) addBackendFactory(Unicorn2Factory(true))
         }
-        //.addBackendFactory(KvmFactory(true))
-        // 修复Linux arm设备，不支持的问题
-        //.addBackendFactory(HypervisorFactory(true))
         .build()!!
     protected val memory = emulator.memory!!
     internal val vm = emulator.createDalvikVM()!!
 
     init {
-        vm.setVerbose(debug)
+        vm.setVerbose(CONFIG.unidbg.debug)
         val syscall = emulator.syscallHandler
-        syscall.isVerbose = debug
+        syscall.isVerbose = CONFIG.unidbg.debug
         syscall.setEnableThreadDispatcher(true)
         AndroidModule(emulator, vm).register(memory)
     }
