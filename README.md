@@ -40,7 +40,6 @@
   // i>=20 i<=50
   "reload_interval": 40, 
   "protocol": {
-    "sub_app_id": 537164840,
     "qua": "V1_AND_SQ_8.9.63_4194_YYB_D",
     // version和code可以从qua中提取
     "version": "8.9.63", 

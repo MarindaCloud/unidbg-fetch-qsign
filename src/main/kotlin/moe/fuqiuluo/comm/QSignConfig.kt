@@ -22,8 +22,6 @@ data class UinData(
 
 @Serializable
 data class Protocol(
-    @JsonNames("sub_app_id")
-    var subAppId: Long,
     var qua: String,
     var version: String,
     var code: String
