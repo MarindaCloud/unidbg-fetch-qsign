@@ -52,8 +52,8 @@ class Handler(
         this.source = from
         this.isCallComplete = true
         unregister()
-        reentrantLock.unlock()
         this.dataListener?.onReceive(from)
+        reentrantLock.unlock()
     }
 
     private fun unregister() {
