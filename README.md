@@ -21,7 +21,7 @@
 
 其中```protocol```中的参数可以从[protocol-versions](https://github.com/RomiChan/protocol-versions)获取
 
-```json
+```json5
 { // 复制这里的话，请把注释删除
   "server": {
     "host": "0.0.0.0",
