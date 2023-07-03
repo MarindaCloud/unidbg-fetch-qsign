@@ -17,7 +17,7 @@
 
 - 解压后cd到解压目录，配置config.json文件。<br>
 
-其中```protocol```中的参数可以从[protocol-versions](https://github.com/RomiChan/protocol-versions)获取
+其中```protocol```中的参数可以从[protocol-versions](https://github.com/RomiChan/protocol-versions)获取！
 
 ```json5
 { // 复制这里的话，请把注释删除
@@ -25,18 +25,9 @@
     "host": "0.0.0.0",
     "port": 8080
   },
-  "uin_list": [ // 未出现在uinList的qq无法访问api!
-    {
-      // uin也就是你的QQQ
-      "uin": 114514,
-      // 该uin对应的android_id
-      "android_id": "1145141919810114",
-      // 不能是空的哦~~
-      "guid":       "5141919810114514",
-      "qimei36":    "8e11b1f9764fa3b43121f6f510001fa1721a"
-    }
-  ],
-  // 实例重载间隔
+  // 注册实例的密钥
+  "key": "114514",
+  // 实例重载间隔（目前没有用）
   // i>=20 i<=50
   "reload_interval": 40, 
   "protocol": {

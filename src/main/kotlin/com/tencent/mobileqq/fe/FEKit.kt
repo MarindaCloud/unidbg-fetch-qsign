@@ -26,7 +26,7 @@ object FEKit {
         }
 
         ChannelManager.setChannelProxy(vm, vm.newInstance("com/tencent/mobileqq/channel/ChannelProxy"))
-        ChannelManager.initReport(vm, CONFIG.protocol.qua, "6.100.248") // TODO(maybe check?)
+        ChannelManager.initReport(vm, vm.envData.qua, "6.100.248") // TODO(maybe check?)
 
         QSec.doSomething(vm, context)
     }

@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "moe.fuqiuluo"
-version = "1.1.1"
+version = "1.1.2"
 
 repositories {
     mavenCentral()
@@ -42,16 +42,6 @@ kotlin {
 
 application {
     mainClass.set("MainKt")
-}
-
-distributions {
-    main {
-        contents {
-            from(".") {
-                include("txlib/**")
-            }
-        }
-    }
 }
 
 distributions {

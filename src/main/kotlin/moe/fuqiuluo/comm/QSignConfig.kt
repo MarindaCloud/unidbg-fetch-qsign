@@ -1,6 +1,7 @@
 @file:OptIn(ExperimentalSerializationApi::class)
 package moe.fuqiuluo.comm
 
+import CONFIG
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonNames
@@ -12,12 +13,16 @@ data class Server(
 )
 
 @Serializable
-data class UinData(
+data class EnvData(
     var uin: Long,
     @JsonNames("androidId", "android_id", "imei")
     var androidId: String,
     var guid: String,
-    var qimei36: String
+    var qimei36: String,
+
+    var qua: String = CONFIG.protocol.qua,
+    var version: String = CONFIG.protocol.version,
+    var code: String = CONFIG.protocol.code
 )
 
 @Serializable
@@ -37,8 +42,7 @@ data class UnidbgConfig(
 @Serializable
 data class QSignConfig(
     var server: Server,
-    @JsonNames("uinList", "uin_list")
-    var uinList: ArrayList<UinData>,
+    var key: String,
     @JsonNames("reloadInterval", "reload_interval")
     var reloadInterval: Int,
     var protocol: Protocol,

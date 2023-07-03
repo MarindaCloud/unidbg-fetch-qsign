@@ -3,12 +3,7 @@
     "host": "0.0.0.0",
     "port": 8080
   },
-  "uin_list": [
-    {
-      "uin": 114514,
-      "android_id": ""
-    }
-  ],
+  "key": "114514",
   "reload_interval": 40,
   "protocol": {
     "qua": "V1_AND_SQ_8.9.63_4194_YYB_D",

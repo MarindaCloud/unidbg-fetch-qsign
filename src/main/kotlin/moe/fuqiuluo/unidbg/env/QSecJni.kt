@@ -8,7 +8,7 @@ import com.tencent.mobileqq.dt.model.FEBound
 import com.tencent.mobileqq.qsec.qsecurity.DeepSleepDetector
 import com.tencent.mobileqq.sign.QQSecuritySign
 import kotlinx.coroutines.sync.Mutex
-import moe.fuqiuluo.comm.UinData
+import moe.fuqiuluo.comm.EnvData
 import moe.fuqiuluo.ext.toHexString
 import moe.fuqiuluo.unidbg.QSecVM
 import moe.fuqiuluo.unidbg.vm.GlobalData
@@ -22,7 +22,7 @@ private val logger = LoggerFactory.getLogger(QSecJni::class.java)
 typealias BytesObject = com.github.unidbg.linux.android.dvm.array.ByteArray
 
 class QSecJni(
-    val uinData: UinData,
+    val envData: EnvData,
     val vm: QSecVM,
     val global: GlobalData
 ) : AbstractJni() {
@@ -93,7 +93,7 @@ class QSecJni(
             return StringObject(vm, global["qimei36"] as? String ?: "")
         }
         if (signature == "com/tencent/mobileqq/qsec/qsecurity/QSecConfig->business_qua:Ljava/lang/String;") {
-            return StringObject(vm, CONFIG.protocol.qua)
+            return StringObject(vm, this.vm.envData.qua)
         }
         return super.getStaticObjectField(vm, dvmClass, signature)
     }
@@ -144,7 +144,7 @@ class QSecJni(
                 "DeviceToken-MODEL-XX-V001" -> ""
                 "DeviceToken-ANDROID-ID-V001" -> ""
                 "DeviceToken-qimei36-V001" -> global["qimei36"] as? String ?: ""
-                "MQQ_SP_DEVICETOKEN_DID_DEVICEIDUUID_202207072241" -> UUID.randomUUID().toString() + "|" + CONFIG.protocol.version
+                "MQQ_SP_DEVICETOKEN_DID_DEVICEIDUUID_202207072241" -> UUID.randomUUID().toString() + "|" + this.vm.envData.version
                 "DeviceToken-APN-V001", "DeviceToken-TuringCache-V001", "DeviceToken-MAC-ADR-V001", "DeviceToken-wifissid-V001" -> "-1"
                 else -> error("Not support mmKVValue:$key")
             })
@@ -152,7 +152,7 @@ class QSecJni(
         if (signature == "android/provider/Settings\$System->getString(Landroid/content/ContentResolver;Ljava/lang/String;)Ljava/lang/String;") {
             val key = vaList.getObjectArg<StringObject>(1).value
             if (key == "android_id") {
-                return StringObject(vm, uinData.androidId.lowercase())
+                return StringObject(vm, envData.androidId.lowercase())
             }
         }
         if (signature == "com/tencent/mobileqq/fe/utils/DeepSleepDetector->getCheckResult()Ljava/lang/String;") {
@@ -206,19 +206,19 @@ class QSecJni(
         }
         if (signature == "com/tencent/mobileqq/dt/app/Dtc->getAppVersionName(Ljava/lang/String;)Ljava/lang/String;") {
             return StringObject(vm, when(val key = vaList.getObjectArg<StringObject>(0).value) {
-                "empty" -> CONFIG.protocol.version
+                "empty" -> this.vm.envData.version
                 else -> error("Not support getAppVersionName:$key")
             })
         }
         if (signature == "com/tencent/mobileqq/dt/app/Dtc->getAppVersionCode(Ljava/lang/String;)Ljava/lang/String;") {
             return StringObject(vm, when(val key = vaList.getObjectArg<StringObject>(0).value) {
-                "empty" -> CONFIG.protocol.code
+                "empty" -> this.vm.envData.code
                 else -> error("Not support getAppVersionCode:$key")
             })
         }
         if (signature == "com/tencent/mobileqq/dt/app/Dtc->getAppInstallTime(Ljava/lang/String;)Ljava/lang/String;") {
             return StringObject(vm, when(val key = vaList.getObjectArg<StringObject>(0).value) {
-                "empty" -> System.currentTimeMillis().toString()
+                "empty" -> (System.currentTimeMillis() - 10000).toString()
                 else -> error("Not support getAppVersionCode:$key")
             })
         }

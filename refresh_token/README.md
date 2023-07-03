@@ -1,5 +1,43 @@
 # 初始化Sign
 
+ - 执行```/register```请求，注册对应QQ实例进系统。
+
+```kotlin
+http://your.host:port/register?uin=[QQ]&android_id=[ANDROID_ID]&guid=[GUID]&qimei36=[QIMEI36]&key=[KEY]
+```
+
+### 如果是第一次注册实例则会出现以下返回
+
+```json5
+{
+    "code": 0,
+    "msg": "Instance loaded successfully.",
+    "data": ""
+}
+```
+
+如果这个QQ已经注册实例了，但是又执行一次，则会以下返回
+
+```json5
+{
+    "code": 0,
+    "msg": "The QQ has already loaded an instance, so this time it is deleting the existing instance and creating a new one.",
+    "data": ""
+}
+```
+
+### 未注册实例请求API会出现以下返回
+
+```json5
+{
+    "code": 1,
+    "msg": "Uin is not registered.",
+    "data": "/sign?uin=xxx&qua=V1_AND_SQ_8.9.63_4188_HDBM_T&cmd=xxx&seq=xxx&buffer=xxx"
+}
+```
+
+# 联网更新Token
+
  - 当首次调用```/sign```的时候会有类似以下返回
 
 ```json5
@@ -34,8 +72,8 @@
 
 - 你需要发送```requestCallback```内的Packet（部分Packet需要签sign或者登录后才能发送），并携带callback_id提交返回包给API。
 
-```http request
-http://your.host/submit?uin=[QQ]&cmd=[CMD]&callback_id=[CALLBACK_ID]&buffer=[BUFFER]
+```kotlin
+http://your.host:port/submit?uin=[QQ]&cmd=[CMD]&callback_id=[CALLBACK_ID]&buffer=[BUFFER]
 ```
 
 > WARN: 其中```buffer```参数无需携带4字节（32bit）的长度。
