@@ -129,7 +129,7 @@ POST的内容："uin=" + uin + "&qua=" + qua + "&cmd=" + cmd + "&seq=" + seq + "
 下面这个只是个例子
 
 ```kotlin
-# http://127.0.0.1:8080/energy?&version=[VERSION]&uin=[UIN]&guid=[GUID]&data=[DATA]
+# http://127.0.0.1:8080/energy?version=[VERSION]&uin=[UIN]&guid=[GUID]&data=[DATA]
 ```
 
 |参数名|意义|例子|

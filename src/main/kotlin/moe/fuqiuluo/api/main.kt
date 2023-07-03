@@ -1,5 +1,6 @@
 package moe.fuqiuluo.api
 
+import BuildConfig
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -14,10 +15,10 @@ data class APIResult<T>(val code: Int,
 
 fun Routing.index() {
     get("/") {
-        call.respondTextWriter {
-            write("IAA 云天明\n")
-            write("Time: ")
-            write(System.currentTimeMillis().toString())
-        }
+        @Serializable
+        data class APIInfo (
+            val version: String = BuildConfig.version
+        )
+        call.respond(APIResult(0, "IAA 云天明 章北海", APIInfo()))
     }
 }
