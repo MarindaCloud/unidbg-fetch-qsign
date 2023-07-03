@@ -2,8 +2,7 @@ package moe.fuqiuluo.unidbg
 
 import com.github.unidbg.linux.android.dvm.DvmObject
 import com.tencent.mobileqq.qsec.qsecurity.DeepSleepDetector
-import kotlinx.coroutines.DelicateCoroutinesApi
-import moe.fuqiuluo.comm.UinData
+import moe.fuqiuluo.comm.EnvData
 import moe.fuqiuluo.unidbg.env.FileResolver
 import moe.fuqiuluo.unidbg.env.QSecJni
 import moe.fuqiuluo.unidbg.vm.AndroidVM
@@ -15,7 +14,7 @@ import kotlin.system.exitProcess
 
 class QSecVM(
     val coreLibPath: File,
-    val uinData: UinData,
+    val envData: EnvData,
     dynarmic: Boolean,
     unicorn: Boolean
 ): Destroyable, AndroidVM("com.tencent.mobileqq", dynarmic, unicorn) {
@@ -32,7 +31,7 @@ class QSecVM(
             val resolver = FileResolver(23, this@QSecVM)
             memory.setLibraryResolver(resolver)
             emulator.syscallHandler.addIOResolver(resolver)
-            vm.setJni(QSecJni(uinData, this, global))
+            vm.setJni(QSecJni(envData, this, global))
         }.onFailure {
             it.printStackTrace()
         }

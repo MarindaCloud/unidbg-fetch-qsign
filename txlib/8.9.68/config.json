@@ -3,14 +3,7 @@
     "host": "0.0.0.0",
     "port": 8080
   },
-  "uin_list": [
-    {
-      "uin": 114514,
-      "android_id": "1145141919810114",
-      "guid":       "5141919810114514",
-      "qimei36":    "8e11b1f9764fa3b43121f6f510001fa1721a"
-    }
-  ],
+  "key": "114514",
   "reload_interval": 40,
   "protocol": {
     "qua": "V1_AND_SQ_8.9.68_4218_HDBM_T",
@@ -20,6 +13,6 @@
   "unidbg": {
     "dynarmic": false,
     "unicorn": true,
-    "debug": true
+    "debug": false
   }
 }
