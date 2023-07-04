@@ -19,7 +19,7 @@ fun Routing.register() {
 
         val qua = fetchGet("qua", CONFIG.protocol.qua)!!
         val version = fetchGet("version", CONFIG.protocol.version)!!
-        val code = fetchGet("qua", CONFIG.protocol.code)!!
+        val code = fetchGet("code", CONFIG.protocol.code)!!
 
         val hasRegister = uin in SessionManager
         if (key == CONFIG.key) {
