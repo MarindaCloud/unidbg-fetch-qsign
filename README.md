@@ -98,8 +98,13 @@ services:
 ### 原始energy
 
 ```kotlin
-# http://127.0.0.1:8080/custom_energy?salt=[SALT HEX]&data=[DATA]
+# http://127.0.0.1:8080/custom_energy?uin=[QQ]salt=[SALT HEX]&data=[DATA]
 ```
+| 参数名  |意义|例子|
+|------|-----|-----|
+| UIN  |Bot的QQ号|114514|
+
+> 非专业人员勿用。
 
 ### sign
 
