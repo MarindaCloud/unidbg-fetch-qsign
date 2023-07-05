@@ -1,4 +1,4 @@
-# unidbg-fetch-qsign
+![image](https://github.com/fuqiuluo/unidbg-fetch-qsign/assets/61898844/e99bf7b6-6998-4f31-8f39-42aaac58974d)# unidbg-fetch-qsign
 
 获取QQSign参数通过Unidbg，开放HTTP API。unidbg-fetch-sign最低从QQ8.9.33（不囊括）开始支持，TIM不支持。
 
@@ -90,6 +90,10 @@ services:
       # 按需调整宿主机端口
       - 8901:8080
 ```
+
+# 你可能需要的项目
+
+- [fix-protocol-version](https://github.com/cssxsh/fix-protocol-version)：基于**mirai**的qsign api对接。
 
 # 使用API
 
