@@ -96,7 +96,7 @@ services:
 ## Linux 部署（Ubuntu）
 
 
-0. 环境配置
+### 环境配置
 
 ```bash
 环境配置：
@@ -110,7 +110,7 @@ Yunzai-Bot
 icqq 0.4.8
 ```
 
-1. 下载 unidbg-fetch-qsignre 的 Releases，解压
+### 下载 unidbg-fetch-qsignre 的 Releases，解压
 
 这里以1.1.0为例，记得改下载连接，慢的话可以传上去或者用代理
 
@@ -126,7 +126,7 @@ unzip unidbg-fetch-qsign-1.1.0.zip
 ```
 
 
-2. 获取项目内 txlib 文件夹（Releases V1.1.3 JAR 已包含，这步不需要）
+### 获取项目内 txlib 文件夹（Releases V1.1.3 JAR 已包含，这步不需要）
 
 这里 clone 了整个 unidbg-fetch-qsign 项目，之后按需复制
 
@@ -138,7 +138,7 @@ cp -r unidbg-fetch-qsign/txlib unidbg-fetch-qsign-1.1.0/
 ```
 
 
-3. 修改配置文件，初次运行
+### 修改配置文件，初次运行
 
 检查 java
 
@@ -169,7 +169,7 @@ releases 1.1.3 最好修改 txlib/8.9.63/config.json 文件，之后执行
 
 测试可以正常运行，ctrl+c结束
 
-4. 后台运行与开机启动 （通过 systemd）
+### 后台运行与开机启动 （通过 systemd）
 
 新建文件
 
