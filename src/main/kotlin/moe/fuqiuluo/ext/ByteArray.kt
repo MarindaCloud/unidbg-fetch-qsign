@@ -19,7 +19,7 @@ import kotlin.experimental.xor
 @JvmOverloads fun ByteArray.toHexString(uppercase: Boolean = true): String = this.joinToString("") {
     (it.toInt() and 0xFF).toString(16)
         .padStart(2, '0')
-        .let { s -> if (uppercase) s.uppercase(Locale.getDefault()) else s }
+        .let { s -> if (uppercase) s.lowercase(Locale.getDefault()) else s }
 }
 
 fun ByteArray.xor(key: ByteArray): ByteArray {
