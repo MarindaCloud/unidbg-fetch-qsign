@@ -59,9 +59,11 @@ bash bin/unidbg-fetch-qsign --basePath=txlib\8.9.63
 
 > --basePath=`/home/your_dir`
 
-## Docker部署 (待修正)
+## Docker部署
 
-[xzhouqd/qsign](https://hub.docker.com/r/xzhouqd/qsign)
+[Dockerhub: xzhouqd/qsign](https://hub.docker.com/r/xzhouqd/qsign)
+
+此Docker image相关提问请到：[xzhouqd/unidbg-fetch-qsign](https://github.com/XZhouQD/unidbg-fetch-qsign) 提交issue
 
 ## docker-compose部署
 
