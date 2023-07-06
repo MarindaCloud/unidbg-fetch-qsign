@@ -46,7 +46,7 @@
 
 
 ```shell
-bash bin/unidbg-fetch-qsign --basePath=txlib\8.9.63
+bash bin/unidbg-fetch-qsign --basePath=txlib/8.9.63
 ```
 - 注意：你需要手动从apk安装包的`lib/arm64-v8a`目录中提取出[libfekit.so](txlib%2F8.9.63%2Flibfekit.so)、[libQSec.so](txlib%2F8.9.63%2FlibQSec.so)文件并存放至一个文件夹，然后使用`--basePath`指定该文件夹的`绝对路径`，结构例如：
 > - your_dir<br>
@@ -100,7 +100,7 @@ services:
 ### 原始energy
 
 ```kotlin
-# http://127.0.0.1:8080/custom_energy?uin=[QQ]salt=[SALT HEX]&data=[DATA]
+# http://127.0.0.1:8080/custom_energy?uin=[QQ]&salt=[SALT HEX]&data=[DATA]
 ```
 | 参数名  |意义|例子|
 |------|-----|-----|
