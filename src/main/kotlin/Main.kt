@@ -1,76 +1,59 @@
-import com.tencent.mobileqq.fe.FEKit
+import com.tencent.mobileqq.dt.model.FEBound
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.plugins.statuspages.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.json.Json
-import moe.fuqiuluo.api.configEnergy
-import moe.fuqiuluo.api.configIndex
-import moe.fuqiuluo.api.configSign
+import moe.fuqiuluo.api.*
+import moe.fuqiuluo.comm.QSignConfig
+import moe.fuqiuluo.comm.checkIllegal
 import moe.fuqiuluo.comm.invoke
-import moe.fuqiuluo.ext.toInt
-import moe.fuqiuluo.unidbg.QSecVMWorker
-import moe.fuqiuluo.unidbg.pool.FixedWorkPool
-import moe.fuqiuluo.unidbg.workerPool
-import org.slf4j.LoggerFactory
 import java.io.File
 
-/*
- * 8.9.63:
- * QUA = V1_AND_SQ_8.9.63_4188_HDBM_T
- * version = 6.100.248
- */
+lateinit var CONFIG: QSignConfig
+lateinit var BASE_PATH: File
 
-
-var QQ_VERSION = "8.9.63" // 获取TX远程SecConfig配置版本信息
-var QQ_CODE = "4186"
-var QUA = "V1_AND_SQ_8.9.63_4188_HDBM_T"
-var CHANNEL_VERSION = "6.100.248"
-var ANDROID_ID = ""
-var isDynarmic: Boolean = false
-
-private val logger = LoggerFactory.getLogger(Main::class.java)
-var debug: Boolean = false // 调试模式
+private val API_LIST = arrayOf(
+    Routing::index,
+    Routing::sign,
+    Routing::energy,
+    Routing::submit,
+    Routing::requestToken,
+    Routing::register
+)
 
 fun main(args: Array<String>) {
-    var host: String
-    var port = 0 // API端口
-    var workerCount = 2 // UNIDBG实例数量
-    var coreLibPath: File // 核心二进制文件路径
-    val reloadInterval: Long = 40 // 实例重载间隔（分钟）
-
     args().also {
-        host = it["host", "Lack of server.host."]
-        port = it["port", "Lack of server.port."]
-            .toInt(1 .. 65535) { "Port is out of range." }
-        workerCount = it["count", "Lack of workerCount(count)."]
-            .toInt(1 .. 100) { "workerCount is out of range." }
-        coreLibPath = File(it["library", "Lack of libfekit.so path."])
-        if (!coreLibPath.exists() || !coreLibPath.isDirectory) {
-            error("libfekit.so file is illegal. Your path must include libfekit.so and libQSec.so!")
+        val baseDir = File(it["basePath", "Lack of basePath."]).also {
+            BASE_PATH = it
         }
-
-        ANDROID_ID = it["android_id", "Lack of android_id"]
-        isDynarmic = "dynarmic" in it
-
-        debug = "debug" in it
+        if (!baseDir.exists() ||
+            !baseDir.isDirectory ||
+            !baseDir.resolve("libfekit.so").exists() ||
+            !baseDir.resolve("libQSec.so").exists() ||
+            !baseDir.resolve("config.json").exists()
+            || !baseDir.resolve("dtconfig.json").exists()
+        ) {
+            error("The base path is invalid, perhaps it is not a directory or something is missing inside.")
+        } else {
+            Json {
+                ignoreUnknownKeys = true
+            }
+            FEBound.initAssertConfig(baseDir)
+            CONFIG = Json.decodeFromString<QSignConfig>(baseDir.resolve("config.json").readText())
+                .apply { checkIllegal() }
+        }
     }
 
-    logger.info("Unidbg workerCount: $workerCount")
-    logger.info("Debug enable: $debug")
-
-    workerPool = FixedWorkPool(workerCount, {
-        logger.info("Try to construct QSignWorker.")
-        QSecVMWorker(it, coreLibPath, isDynarmic).apply { work {
-            init()
-            FEKit.init(this)
-        } }
-    }, reloadInterval)
-
-    embeddedServer(Netty, host = host, port = port, module = Application::init)
+    CONFIG.server.also {
+        embeddedServer(Netty, host = it.host, port = it.port, module = Application::init)
         .start(wait = true)
+    }
 }
 
 fun Application.init() {
@@ -80,9 +63,15 @@ fun Application.init() {
             isLenient = true
         })
     }
+    install(StatusPages) {
+        exception<Throwable> { call, cause ->
+            if (CONFIG.unidbg.debug) {
+                cause.printStackTrace()
+            }
+            call.respond(APIResult(1, cause.message ?: cause.javaClass.name, call.request.uri))
+        }
+    }
     routing {
-        configIndex()
-        configEnergy()
-        configSign()
+        API_LIST.forEach { it(this) }
     }
 }

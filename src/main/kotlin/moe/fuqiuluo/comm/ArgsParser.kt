@@ -17,13 +17,17 @@ class ArgsParser(
         }
     }
 
-    operator fun get(key: String): String {
-        return map[key]!!
+    operator fun get(key: String): String? {
+        return map[key]
+    }
+
+    fun getOrDefault(key: String, def: String?): String? {
+        return get(key) ?: def
     }
 
     operator fun get(key: String, err: String): String {
         require(key in this) { err }
-        return this[key]
+        return this[key]!!
     }
 
     operator fun contains(key: String): Boolean {
