@@ -91,6 +91,137 @@ services:
       - 8901:8080
 ```
 
+
+
+## Linux 部署（Ubuntu）
+
+
+### 环境配置
+
+```bash
+环境配置：
+x86
+Ubuntu 22.04.1
+openjdk version "19.0.2" 
+在root家目录操作
+
+机器人：
+Yunzai-Bot
+icqq 0.4.8
+```
+
+### 下载 unidbg-fetch-qsignre 的 Releases，解压
+
+这里以1.1.0为例，记得改下载连接，慢的话可以传上去或者用代理
+
+https://github.com/fuqiuluo/unidbg-fetch-qsign/releases
+
+```bash
+wget https://github.com/fuqiuluo/unidbg-fetch-qsign/releases/download/1.1.0/unidbg-fetch-qsign-1.1.0.zip
+
+# 没装unzip的话
+apt install unzip
+# 解压，注意文件名
+unzip unidbg-fetch-qsign-1.1.0.zip
+```
+
+
+### 获取项目内 txlib 文件夹（Releases V1.1.3 JAR 已包含，这步不需要）
+
+这里 clone 了整个 unidbg-fetch-qsign 项目，之后按需复制
+
+```bash
+git clone https://github.com/fuqiuluo/unidbg-fetch-qsign.git
+
+# 复制txlib，注意目录
+cp -r unidbg-fetch-qsign/txlib unidbg-fetch-qsign-1.1.0/
+```
+
+
+### 修改配置文件，初次运行
+
+检查 java
+
+```bash
+java -version
+
+# 没装的话
+apt install openjdk-19-jdk
+```
+
+查看端口占用
+
+```bash
+netstat -lntp
+```
+
+releases 1.1.0 在这时可以直接运行，注意修改参数，这里使用绝对路径
+
+```bash
+/root/unidbg-fetch-qsign-1.1.0/bin/unidbg-fetch-qsign --host=127.0.0.1 --port=8901  --count=2 --library=/root/unidbg-fetch-qsign-1.1.0/txlib/8.9.63  --android_id=我自己填的是device.json里面的参数
+```
+
+releases 1.1.3 最好修改 txlib/8.9.63/config.json 文件，之后执行
+
+```bash
+/root/unidbg-fetch-qsign-1.1.3/bin/unidbg-fetch-qsign --basePath=/root/unidbg-fetch-qsign-1.1.3/txlib/8.9.63
+```
+
+测试可以正常运行，ctrl+c结束
+
+### 后台运行与开机启动 （通过 systemd）
+
+新建文件
+
+```bash
+vi /etc/systemd/system/qsign.service
+
+#========在qsign.service文件中输入以下内容========
+#========注意更改Service参数，要用绝对路径========
+[Unit]
+Description=unidbg-fetch-qsign
+After=network.target
+
+[Service]
+ExecStart=这里输入之前前台运行测试成功的命令
+
+[Install]
+WantedBy=multi-user.target
+#================
+
+```
+
+重载与启动
+
+```bash
+
+#重载服务，每次修改都要
+sudo systemctl daemon-reload
+#启动qsign
+sudo systemctl start qsign
+
+#查看端口情况，可见已在指定的port开启服务
+netstat -lntp
+
+#以下数条可按需执行
+#启动
+sudo systemctl start qsign
+#停止
+sudo systemctl stop qsign
+#重启
+sudo systemctl restart qsign
+#设置开机启动
+sudo systemctl enable qsign
+#禁用开机启动
+sudo systemctl disable qsign
+#查看运行状态
+sudo systemctl status qsign
+
+```
+
+
+
+
 # 你可能需要的项目
 
 - [fix-protocol-version](https://github.com/cssxsh/fix-protocol-version)：基于**mirai**的qsign api对接。
