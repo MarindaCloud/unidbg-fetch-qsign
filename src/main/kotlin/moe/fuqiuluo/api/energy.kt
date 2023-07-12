@@ -1,14 +1,17 @@
 package moe.fuqiuluo.api
 
+import CONFIG
 import com.tencent.crypt.Crypt
 import com.tencent.mobileqq.qsec.qsecdandelionsdk.Dandelion
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import moe.fuqiuluo.comm.EnvData
 import moe.fuqiuluo.ext.failure
 import moe.fuqiuluo.ext.fetchGet
 import moe.fuqiuluo.ext.hex2ByteArray
 import moe.fuqiuluo.ext.toHexString
+import moe.fuqiuluo.unidbg.session.SessionManager
 import moe.fuqiuluo.utils.EMPTY_BYTE_ARRAY
 import moe.fuqiuluo.utils.MD5
 import java.nio.ByteBuffer
@@ -19,7 +22,10 @@ fun Routing.energy() {
         val data = fetchGet("data")!!
         val salt = fetchGet("salt")!!.hex2ByteArray()
 
-        val session = findSession(uin)
+        val session = initSession(uin) ?: run {
+            SessionManager.register(EnvData(uin, "", "", "", CONFIG.protocol.qua, CONFIG.protocol.version, CONFIG.protocol.code))
+            findSession(uin)
+        }
 
         val sign = session.withLock {
             Dandelion.energy(session.vm, data, salt)
@@ -29,7 +35,10 @@ fun Routing.energy() {
 
     get("/energy") {
         val uin = fetchGet("uin")!!.toLong()
-        val session = findSession(uin)
+        val session = initSession(uin) ?: run {
+            SessionManager.register(EnvData(uin, "", "", "", CONFIG.protocol.qua, CONFIG.protocol.version, CONFIG.protocol.code))
+            findSession(uin)
+        }
 
         val data = fetchGet("data")!!
         if(!(data.startsWith("810_") || data.startsWith("812_"))) {
