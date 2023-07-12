@@ -19,7 +19,6 @@ fun Routing.submit() {
 
         session.withLock {
             ChannelManager.onNativeReceive(session.vm, cmd, buffer, callbackId)
-
             session.vm.global["HAS_SUBMIT"] = true
         }
 
