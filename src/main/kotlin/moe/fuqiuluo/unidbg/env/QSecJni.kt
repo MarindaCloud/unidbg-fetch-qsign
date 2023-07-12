@@ -1,8 +1,9 @@
 @file:Suppress("UNCHECKED_CAST")
+
 package moe.fuqiuluo.unidbg.env
 
-import CONFIG
 import com.github.unidbg.linux.android.dvm.*
+import com.github.unidbg.linux.android.dvm.array.ArrayObject
 import com.tencent.mobileqq.channel.SsoPacket
 import com.tencent.mobileqq.dt.model.FEBound
 import com.tencent.mobileqq.qsec.qsecurity.DeepSleepDetector
@@ -15,7 +16,6 @@ import moe.fuqiuluo.unidbg.vm.GlobalData
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.util.*
-import kotlin.collections.ArrayList
 
 private val logger = LoggerFactory.getLogger(QSecJni::class.java)
 
@@ -63,7 +63,7 @@ class QSecJni(
 
             println("uin = ${global["uin"]}, id = $callbackId, sendPacket(cmd = $cmd, data = $hex)")
             (global["PACKET"] as ArrayList<SsoPacket>).add(SsoPacket(cmd, hex, callbackId))
-            (global["mutex"] as Mutex).also { if(it.isLocked) it.unlock() }
+            (global["mutex"] as Mutex).also { if (it.isLocked) it.unlock() }
             return
         }
 
@@ -100,10 +100,14 @@ class QSecJni(
 
     override fun getObjectField(vm: BaseVM, dvmObject: DvmObject<*>, signature: String): DvmObject<*> {
         if (signature == "android/content/pm/ApplicationInfo->nativeLibraryDir:Ljava/lang/String;") {
-            return StringObject(vm, "/data/app/~~vbcRLwPxS0GyVfqT-nCYrQ==/com.tencent.mobileqq-xJKJPVp9lorkCgR_w5zhyA==/lib/arm64")
+            return StringObject(
+                vm,
+                "/data/app/~~vbcRLwPxS0GyVfqT-nCYrQ==/com.tencent.mobileqq-xJKJPVp9lorkCgR_w5zhyA==/lib/arm64"
+            )
         }
         return super.getObjectField(vm, dvmObject, signature)
     }
+
     override fun setObjectField(vm: BaseVM, dvmObject: DvmObject<*>, signature: String, value: DvmObject<*>) {
         if (signature == "com/tencent/mobileqq/sign/QQSecuritySign\$SignResult->token:[B") {
             val data = value.value as ByteArray
@@ -137,17 +141,21 @@ class QSecJni(
         vaList: VaList
     ): DvmObject<*> {
         if (signature == "com/tencent/mobileqq/dt/app/Dtc->mmKVValue(Ljava/lang/String;)Ljava/lang/String;") {
-            return StringObject(vm, when (val key = vaList.getObjectArg<StringObject>(0).value) {
-                "TuringRiskID-TuringCache-20230511" -> ""
-                "o3_switch_Xwid", "o3_xwid_switch" -> global["o3_switch_Xwid"] as? String ?: "1"
-                "DeviceToken-oaid-V001" -> ""
-                "DeviceToken-MODEL-XX-V001" -> ""
-                "DeviceToken-ANDROID-ID-V001" -> ""
-                "DeviceToken-qimei36-V001" -> global["qimei36"] as? String ?: ""
-                "MQQ_SP_DEVICETOKEN_DID_DEVICEIDUUID_202207072241" -> UUID.randomUUID().toString() + "|" + this.vm.envData.version
-                "DeviceToken-APN-V001", "DeviceToken-TuringCache-V001", "DeviceToken-MAC-ADR-V001", "DeviceToken-wifissid-V001" -> "-1"
-                else -> error("Not support mmKVValue:$key")
-            })
+            return StringObject(
+                vm, when (val key = vaList.getObjectArg<StringObject>(0).value) {
+                    "TuringRiskID-TuringCache-20230511" -> ""
+                    "o3_switch_Xwid", "o3_xwid_switch" -> global["o3_switch_Xwid"] as? String ?: "1"
+                    "DeviceToken-oaid-V001" -> ""
+                    "DeviceToken-MODEL-XX-V001" -> ""
+                    "DeviceToken-ANDROID-ID-V001" -> ""
+                    "DeviceToken-qimei36-V001" -> global["qimei36"] as? String ?: ""
+                    "MQQ_SP_DEVICETOKEN_DID_DEVICEIDUUID_202207072241" -> UUID.randomUUID()
+                        .toString() + "|" + this.vm.envData.version
+
+                    "DeviceToken-APN-V001", "DeviceToken-TuringCache-V001", "DeviceToken-MAC-ADR-V001", "DeviceToken-wifissid-V001" -> "-1"
+                    else -> error("Not support mmKVValue:$key")
+                }
+            )
         }
         if (signature == "android/provider/Settings\$System->getString(Landroid/content/ContentResolver;Ljava/lang/String;)Ljava/lang/String;") {
             val key = vaList.getObjectArg<StringObject>(1).value
@@ -172,86 +180,103 @@ class QSecJni(
                 .newObject(ClassLoader.getSystemClassLoader())
         }
         if (signature == "com/tencent/mobileqq/dt/app/Dtc->getPropSafe(Ljava/lang/String;)Ljava/lang/String;") {
-            return StringObject(vm, when(val key = vaList.getObjectArg<StringObject>(0).value) {
-                "ro.build.id" -> "TKQ1.220905.001"
-                "ro.build.display.id" -> "TKQ1.220905.001 test-keys"
-                "ro.product.device", "ro.product.name" -> "mondrian"
-                "ro.product.board" -> "taro"
-                "ro.product.manufacturer" -> "Xiaomi"
-                "ro.product.brand" -> "Redmi"
-                "ro.bootloader" -> "unknown"
-                "persist.sys.timezone" -> "Asia/Shanghai"
-                "ro.hardware" -> "qcom"
-                "ro.product.cpu.abilist" -> "arm64-v8a, armeabi-v7a, armeabi"
-                "ro.build.version.incremental" -> "V14.0.18.0.CNMLGB"
-                "ro.build.version.release" -> "12"
-                "ro.build.version.base_os", "ro.boot.container", "ro.vendor.build.fingerprint", "ro.build.expect.bootloader", "ro.build.expect.baseband" -> ""
-                "ro.build.version.security_patch" -> "2077-2-29"
-                "ro.build.version.preview_sdk" -> "0"
-                "ro.build.version.codename", "ro.build.version.all_codenames" -> "REL"
-                "ro.build.type" -> "user"
-                "ro.build.tags" -> "release-keys"
-                "ro.treble.enabled" -> "true"
-                "ro.build.date.utc" -> "1673390476"
-                "ro.build.user" -> ""
-                "ro.build.host" -> "build"
-                "net.bt.name" -> "Android"
-                "ro.build.characteristics" -> "default"
-                "ro.build.description" -> "mondrian-user 12 TKQ1.220905.001 release-keys"
-                "ro.product.locale" -> "zh-CN"
-                "ro.build.flavor" -> "full_miui_64-user"
-                "ro.config.ringtone" -> "Ring_Synth_04.ogg"
-                else -> error("Not support prop:$key")
-            })
+            return StringObject(
+                vm, when (val key = vaList.getObjectArg<StringObject>(0).value) {
+                    "ro.build.id" -> "TKQ1.220905.001"
+                    "ro.build.display.id" -> "TKQ1.220905.001 test-keys"
+                    "ro.product.device", "ro.product.name" -> "mondrian"
+                    "ro.product.board" -> "taro"
+                    "ro.product.manufacturer" -> "Xiaomi"
+                    "ro.product.brand" -> "Redmi"
+                    "ro.bootloader" -> "unknown"
+                    "persist.sys.timezone" -> "Asia/Shanghai"
+                    "ro.hardware" -> "qcom"
+                    "ro.product.cpu.abilist" -> "arm64-v8a, armeabi-v7a, armeabi"
+                    "ro.build.version.incremental" -> "V14.0.18.0.CNMLGB"
+                    "ro.build.version.release" -> "12"
+                    "ro.build.version.base_os", "ro.boot.container", "ro.vendor.build.fingerprint", "ro.build.expect.bootloader", "ro.build.expect.baseband" -> ""
+                    "ro.build.version.security_patch" -> "2077-2-29"
+                    "ro.build.version.preview_sdk" -> "0"
+                    "ro.build.version.codename", "ro.build.version.all_codenames" -> "REL"
+                    "ro.build.type" -> "user"
+                    "ro.build.tags" -> "release-keys"
+                    "ro.treble.enabled" -> "true"
+                    "ro.build.date.utc" -> "1673390476"
+                    "ro.build.user" -> ""
+                    "ro.build.host" -> "build"
+                    "net.bt.name" -> "Android"
+                    "ro.build.characteristics" -> "default"
+                    "ro.build.description" -> "mondrian-user 12 TKQ1.220905.001 release-keys"
+                    "ro.product.locale" -> "zh-CN"
+                    "ro.build.flavor" -> "full_miui_64-user"
+                    "ro.config.ringtone" -> "Ring_Synth_04.ogg"
+                    else -> error("Not support prop:$key")
+                }
+            )
         }
         if (signature == "com/tencent/mobileqq/dt/app/Dtc->getAppVersionName(Ljava/lang/String;)Ljava/lang/String;") {
-            return StringObject(vm, when(val key = vaList.getObjectArg<StringObject>(0).value) {
-                "empty" -> this.vm.envData.version
-                else -> error("Not support getAppVersionName:$key")
-            })
+            return StringObject(
+                vm, when (val key = vaList.getObjectArg<StringObject>(0).value) {
+                    "empty" -> this.vm.envData.version
+                    else -> error("Not support getAppVersionName:$key")
+                }
+            )
         }
         if (signature == "com/tencent/mobileqq/dt/app/Dtc->getAppVersionCode(Ljava/lang/String;)Ljava/lang/String;") {
-            return StringObject(vm, when(val key = vaList.getObjectArg<StringObject>(0).value) {
-                "empty" -> this.vm.envData.code
-                else -> error("Not support getAppVersionCode:$key")
-            })
+            return StringObject(
+                vm, when (val key = vaList.getObjectArg<StringObject>(0).value) {
+                    "empty" -> this.vm.envData.code
+                    else -> error("Not support getAppVersionCode:$key")
+                }
+            )
         }
         if (signature == "com/tencent/mobileqq/dt/app/Dtc->getAppInstallTime(Ljava/lang/String;)Ljava/lang/String;") {
-            return StringObject(vm, when(val key = vaList.getObjectArg<StringObject>(0).value) {
-                "empty" -> (System.currentTimeMillis() - 10000).toString()
-                else -> error("Not support getAppVersionCode:$key")
-            })
+            return StringObject(
+                vm, when (val key = vaList.getObjectArg<StringObject>(0).value) {
+                    "empty" -> (System.currentTimeMillis() - 10000).toString()
+                    else -> error("Not support getAppVersionCode:$key")
+                }
+            )
         }
         if (
             signature == "com/tencent/mobileqq/dt/app/Dtc->getDensity(Ljava/lang/String;)Ljava/lang/String;" ||
             signature == "com/tencent/mobileqq/dt/app/Dtc->getFontDpi(Ljava/lang/String;)Ljava/lang/String;"
-            ) {
-            return StringObject(vm, when(val key = vaList.getObjectArg<StringObject>(0).value) {
-                "empty" -> "1.3125"
-                else -> error("Not support getAppVersionCode:$key")
-            })
+        ) {
+            return StringObject(
+                vm, when (val key = vaList.getObjectArg<StringObject>(0).value) {
+                    "empty" -> "1.3125"
+                    else -> error("Not support getAppVersionCode:$key")
+                }
+            )
         }
         if ("com/tencent/mobileqq/dt/app/Dtc->getScreenSize(Ljava/lang/String;)Ljava/lang/String;" == signature) {
             return StringObject(vm, "[800,1217]")
         }
-        if(signature == "com/tencent/mobileqq/dt/app/Dtc->getStorage(Ljava/lang/String;)Ljava/lang/String;" ) {
+        if (signature == "com/tencent/mobileqq/dt/app/Dtc->getStorage(Ljava/lang/String;)Ljava/lang/String;") {
             return StringObject(vm, "137438953471")
         }
         if (signature == "com/tencent/mobileqq/dt/app/Dtc->systemGetSafe(Ljava/lang/String;)Ljava/lang/String;") {
-            return StringObject(vm, when(val key = vaList.getObjectArg<StringObject>(0).value) {
-                "user.locale" -> "zh-CN"
-                "http.agent" -> "Dalvik/2.1.0 (Linux; U; Android 12.0.0; 114514 Build/O11019)"
-                "java.vm.version" -> "2.1.0"
-                "os.version" -> "3.18.79"
-                "persist.sys.timezone" -> "-1"
-                "java.runtime.version" -> "0.9"
-                "java.boot.class.path" -> "/system/framework/core-oj.jar:/system/framework/core-libart.jar:/system/framework/conscrypt.jar:/system/frameworkhttp.jar:/system/framework/bouncycastle.jar:/system/framework/apache-xml.jar:/system/framework/legacy-test.jar:/system/framework/ext.jar:/system/framework/framework.jar:/system/framework/telephony-common.jar:/system/frameworkoip-common.jar:/system/framework/ims-common.jar:/system/framework/org.apache.http.legacy.boot.jar:/system/framework/android.hidl.base-V1.0-java.jar:/system/framework/android.hidl.manager-V1.0-java.jar:/system/framework/mediatek-common.jar:/system/framework/mediatek-framework.jar:/system/framework/mediatek-telephony-common.jar:/system/framework/mediatek-telephony-base.jar:/system/framework/mediatek-ims-common.jar:/system/framework/mediatek-telecom-common.jar:/system/framework/mediatek-cta.jar"
-                else -> error("Not support systemGetSafe:$key")
-            })
+            return StringObject(
+                vm, when (val key = vaList.getObjectArg<StringObject>(0).value) {
+                    "user.locale" -> "zh-CN"
+                    "http.agent" -> "Dalvik/2.1.0 (Linux; U; Android 12.0.0; 114514 Build/O11019)"
+                    "java.vm.version" -> "2.1.0"
+                    "os.version" -> "3.18.79"
+                    "persist.sys.timezone" -> "-1"
+                    "java.runtime.version" -> "0.9"
+                    "java.boot.class.path" -> "/system/framework/core-oj.jar:/system/framework/core-libart.jar:/system/framework/conscrypt.jar:/system/frameworkhttp.jar:/system/framework/bouncycastle.jar:/system/framework/apache-xml.jar:/system/framework/legacy-test.jar:/system/framework/ext.jar:/system/framework/framework.jar:/system/framework/telephony-common.jar:/system/frameworkoip-common.jar:/system/framework/ims-common.jar:/system/framework/org.apache.http.legacy.boot.jar:/system/framework/android.hidl.base-V1.0-java.jar:/system/framework/android.hidl.manager-V1.0-java.jar:/system/framework/mediatek-common.jar:/system/framework/mediatek-framework.jar:/system/framework/mediatek-telephony-common.jar:/system/framework/mediatek-telephony-base.jar:/system/framework/mediatek-ims-common.jar:/system/framework/mediatek-telecom-common.jar:/system/framework/mediatek-cta.jar"
+                    else -> error("Not support systemGetSafe:$key")
+                }
+            )
         }
         if (signature == "com/tencent/mobileqq/dt/app/Dtc->getIME(Ljava/lang/String;)Ljava/lang/String;") {
             return StringObject(vm, "com.netease.nemu_vinput.nemu/com.android.inputmethodcommon.SoftKeyboard")
         }
+
+        if (signature == "java/lang/Thread->currentThread()Ljava/lang/Thread;") {
+            return vm.resolveClass("java/lang/Thread").newObject(null)
+        }
+
         return super.callStaticObjectMethodV(vm, dvmClass, signature, vaList)
     }
 
@@ -293,12 +318,15 @@ class QSecJni(
                 .newObject(null)
         }
         if (signature == "android/content/Context->getPackageResourcePath()Ljava/lang/String;") {
-            return StringObject(vm, "/data/app/~~vbcRLwPxS0GyVfqT-nCYrQ==/com.tencent.mobileqq-xJKJPVp9lorkCgR_w5zhyA==/base.apk")
+            return StringObject(
+                vm,
+                "/data/app/~~vbcRLwPxS0GyVfqT-nCYrQ==/com.tencent.mobileqq-xJKJPVp9lorkCgR_w5zhyA==/base.apk"
+            )
         }
         if (signature == "android/content/Context->getPackageName()Ljava/lang/String;") {
             return StringObject(vm, "com.tencent.mobileqq")
         }
-        if(signature == "java/lang/ClassLoader->loadClass(Ljava/lang/String;)Ljava/lang/Class;") {
+        if (signature == "java/lang/ClassLoader->loadClass(Ljava/lang/String;)Ljava/lang/Class;") {
             val name = vaList.getObjectArg<StringObject>(0).value
             val loader = dvmObject.value as ClassLoader
             try {
@@ -306,14 +334,18 @@ class QSecJni(
                     .resolveClass("java/lang/Class")
                     .newObject(loader.loadClass(name))
             } catch (e: ClassNotFoundException) {
-                vm.throwException(vm
-                    .resolveClass("java.lang.ClassNotFoundException")
-                    .newObject(e)
+                vm.throwException(
+                    vm
+                        .resolveClass("java.lang.ClassNotFoundException")
+                        .newObject(e)
                 )
             }
-            return  vm
+            return vm
                 .resolveClass("java/lang/Class")
                 .newObject(null)
+        }
+        if ("java/lang/Thread->getStackTrace()[Ljava/lang/StackTraceElement;" == signature) {
+            return ArrayObject()
         }
         return super.callObjectMethodV(vm, dvmObject, signature, vaList)
     }
