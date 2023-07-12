@@ -43,6 +43,8 @@ data class UnidbgConfig(
 data class QSignConfig(
     var server: Server,
     var key: String,
+    @JsonNames("autoRegister", "auto_register")
+    var autoRegister:Boolean,
     @JsonNames("reloadInterval", "reload_interval")
     var reloadInterval: Int,
     var protocol: Protocol,
