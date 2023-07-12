@@ -4,6 +4,7 @@
     "port": 8080
   },
   "key": "114514",
+  "auto_register": true,
   "reload_interval": 40,
   "protocol": {
     "qua": "V1_AND_SQ_8.9.68_4218_HDBM_T",

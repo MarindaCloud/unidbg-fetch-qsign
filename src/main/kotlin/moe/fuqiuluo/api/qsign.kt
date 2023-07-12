@@ -1,4 +1,5 @@
 @file:Suppress("UNCHECKED_CAST")
+
 package moe.fuqiuluo.api
 
 import CONFIG
@@ -10,7 +11,9 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.util.pipeline.*
 import kotlinx.serialization.Serializable
+import moe.fuqiuluo.comm.EnvData
 import moe.fuqiuluo.ext.*
+import moe.fuqiuluo.unidbg.session.SessionManager
 
 
 fun Routing.sign() {
@@ -22,7 +25,11 @@ fun Routing.sign() {
         val buffer = fetchGet("buffer")!!.hex2ByteArray()
         val qimei36 = fetchGet("qimei36", def = "")!!
 
-        requestSign(cmd, uin, qua, seq, buffer, qimei36)
+        // I hope the androidId and guid can be null,but the fetchGet() can not work
+        val androidId = call.parameters["android_id"] ?: ""
+        val guid = call.parameters["guid"] ?: ""
+
+        requestSign(cmd, uin, qua, seq, buffer, qimei36, androidId, guid)
     }
 
     post("/sign") {
@@ -33,8 +40,9 @@ fun Routing.sign() {
         val seq = fetchPost(param, "seq")!!.toInt()
         val buffer = fetchPost(param, "buffer")!!.hex2ByteArray()
         val qimei36 = fetchPost(param, "qimei36", def = "")!!
-
-        requestSign(cmd, uin, qua, seq, buffer, qimei36)
+        val androidId = param["android_id"] ?: ""
+        val guid = param["guid"] ?: ""
+        requestSign(cmd, uin, qua, seq, buffer, qimei36, androidId, guid)
     }
 }
 
@@ -47,8 +55,33 @@ private data class Sign(
     val requestCallback: List<SsoPacket>
 )
 
-private suspend fun PipelineContext<Unit, ApplicationCall>.requestSign(cmd: String, uin: String, qua: String, seq: Int, buffer: ByteArray, qimei36: String) {
-    val session = findSession(uin.toLong())
+private suspend fun PipelineContext<Unit, ApplicationCall>.requestSign(
+    cmd: String,
+    uin: String,
+    qua: String,
+    seq: Int,
+    buffer: ByteArray,
+    qimei36: String,
+    androidId: String,
+    guid: String
+) {
+    val session = initSession(uin.toLong()) ?: run {
+        if (androidId.isNullOrEmpty() || guid.isNullOrEmpty()) {
+            throw MissingKeyError
+        }
+        SessionManager.register(
+            EnvData(
+                uin.toLong(),
+                androidId,
+                guid,
+                qimei36,
+                qua,
+                CONFIG.protocol.version,
+                CONFIG.protocol.code
+            )
+        )
+        findSession(uin.toLong())
+    }
     val vm = session.vm
     if (qimei36.isNotEmpty()) {
         vm.global["qimei36"] = qimei36
@@ -66,9 +99,13 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.requestSign(cmd: Stri
         }
     }
 
-    call.respond(APIResult(0, "success", Sign(
-        sign.token.toHexString(),
-        sign.extra.toHexString(),
-        sign.sign.toHexString(), o3did, list
-    )))
+    call.respond(
+        APIResult(
+            0, "success", Sign(
+                sign.token.toHexString(),
+                sign.extra.toHexString(),
+                sign.sign.toHexString(), o3did, list
+            )
+        )
+    )
 }

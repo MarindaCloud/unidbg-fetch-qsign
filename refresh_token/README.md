@@ -36,6 +36,11 @@ http://your.host:port/register?uin=[QQ]&android_id=[ANDROID_ID]&guid=[GUID]&qime
 }
 ```
 
+### 关于自动注册实例的说明
+
+ - 如果不想使用/register注册实例，想直接使用/energy和/sign请求，你可以在config.json修改auto_register参数为true，后台则启用自动注册实例功能。
+ - 此外，需要注意的是，你需要在首次请求/sign或/energy提交额外的参数android_id、guid，后续请求参数android_id、guid可加可不加。
+
 # 联网更新Token
 
  - 当首次调用```/sign```的时候会有类似以下返回
