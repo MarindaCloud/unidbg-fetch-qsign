@@ -25,14 +25,16 @@
   },
   // 注册实例的密钥
   "key": "114514",
+  // 启用自动注册实例（需要1.1.4及以上版本才会生效）
+  "auto_register": true,
   // 实例重载间隔（目前没有用）
   // i>=20 i<=50
   "reload_interval": 40, 
   "protocol": {
-    "qua": "V1_AND_SQ_8.9.63_4194_YYB_D",
+    "qua": "V1_AND_SQ_8.9.68_4264_YYB_D",
     // version和code可以从qua中提取
-    "version": "8.9.63", 
-    "code": "4194"
+    "version": "8.9.68", 
+    "code": "4264"
   },
   "unidbg": {
     // 启用Dynarmic，它是一个开源的动态ARM指令集模拟器
@@ -46,7 +48,7 @@
 
 
 ```shell
-bash bin/unidbg-fetch-qsign --basePath=txlib/8.9.63
+bash bin/unidbg-fetch-qsign --basePath=txlib/8.9.68
 ```
 - 注意：你需要手动从apk安装包的`lib/arm64-v8a`目录中提取出[libfekit.so](txlib%2F8.9.63%2Flibfekit.so)、[libQSec.so](txlib%2F8.9.63%2FlibQSec.so)文件并存放至一个文件夹，然后使用`--basePath`指定该文件夹的`绝对路径`，结构例如：
 > - your_dir<br>
@@ -80,7 +82,7 @@ services:
     restart: always
     working_dir: /app
     # 按需修改相关参数
-    command: bash bin/unidbg-fetch-qsign --port=8080 --count=1 --library=txlib/8.9.63 --android_id=someandroidid
+    command: bash bin/unidbg-fetch-qsign --basePath=txlib/8.9.68
     volumes:
       # 当前目录放置qsign的解压包
       - ./unidbg-fetch-qsign:/app
@@ -103,44 +105,28 @@ services:
 x86
 Ubuntu 22.04.1
 openjdk version "19.0.2" 
-在root家目录操作
 
-机器人：
-Yunzai-Bot
-icqq 0.4.8
+在root家目录操作
 ```
 
-### 下载 unidbg-fetch-qsignre 的 Releases，解压
+### 下载 unidbg-fetch-qsign 的 Releases，解压
 
-这里以1.1.0为例，记得改下载连接，慢的话可以传上去或者用代理
+这里以1.1.3为例，记得改下载连接，慢的话可以传上去或者用代理
 
 https://github.com/fuqiuluo/unidbg-fetch-qsign/releases
 
 ```bash
-wget https://github.com/fuqiuluo/unidbg-fetch-qsign/releases/download/1.1.0/unidbg-fetch-qsign-1.1.0.zip
+wget https://github.com/fuqiuluo/unidbg-fetch-qsign/releases/download/1.1.0/unidbg-fetch-qsign-1.1.3.zip
 
 # 没装unzip的话
 apt install unzip
 # 解压，注意文件名
-unzip unidbg-fetch-qsign-1.1.0.zip
+unzip unidbg-fetch-qsign-1.1.3.zip
 ```
-
-
-### 获取项目内 txlib 文件夹（Releases V1.1.3 JAR 已包含，这步不需要）
-
-这里 clone 了整个 unidbg-fetch-qsign 项目，之后按需复制
-
-```bash
-git clone https://github.com/fuqiuluo/unidbg-fetch-qsign.git
-
-# 复制txlib，注意目录
-cp -r unidbg-fetch-qsign/txlib unidbg-fetch-qsign-1.1.0/
-```
-
 
 ### 修改配置文件，初次运行
 
-检查 java
+- 检查 java
 
 ```bash
 java -version
@@ -149,29 +135,22 @@ java -version
 apt install openjdk-19-jdk
 ```
 
-查看端口占用
+- 查看端口占用
 
 ```bash
 netstat -lntp
 ```
-
-releases 1.1.0 在这时可以直接运行，注意修改参数，这里使用绝对路径
-
-```bash
-/root/unidbg-fetch-qsign-1.1.0/bin/unidbg-fetch-qsign --host=127.0.0.1 --port=8901  --count=2 --library=/root/unidbg-fetch-qsign-1.1.0/txlib/8.9.63  --android_id=我自己填的是device.json里面的参数
-```
-
-releases 1.1.3 最好修改 txlib/8.9.63/config.json 文件，之后执行
+- 确定配置好config.json文件后尝试启动
 
 ```bash
-/root/unidbg-fetch-qsign-1.1.3/bin/unidbg-fetch-qsign --basePath=/root/unidbg-fetch-qsign-1.1.3/txlib/8.9.63
+/root/unidbg-fetch-qsign-1.1.3/bin/unidbg-fetch-qsign --basePath=/root/unidbg-fetch-qsign-1.1.3/txlib/8.9.68
 ```
 
 测试可以正常运行，ctrl+c结束
 
 ### 后台运行与开机启动 （通过 systemd）
 
-新建文件
+- 新建文件
 
 ```bash
 vi /etc/systemd/system/qsign.service
@@ -191,7 +170,7 @@ WantedBy=multi-user.target
 
 ```
 
-重载与启动
+- 重载与启动
 
 ```bash
 
@@ -219,9 +198,6 @@ sudo systemctl status qsign
 
 ```
 
-
-
-
 # 你可能需要的项目
 
 - [fix-protocol-version](https://github.com/cssxsh/fix-protocol-version)：基于**mirai**的qsign api对接。
@@ -233,26 +209,26 @@ sudo systemctl status qsign
 ### 原始energy
 
 ```kotlin
-# http://127.0.0.1:8080/custom_energy?uin=[QQ]&salt=[SALT HEX]&data=[DATA]
+# http://host:port/custom_energy?uin=[QQ]&salt=[SALT HEX]&data=[DATA]
 ```
-| 参数名  |意义|例子|
-|------|-----|-----|
-| UIN  |Bot的QQ号|114514|
+| 参数名 | 意义      | 例子     |
+|-----|---------|--------|
+| UIN | Bot的QQ号 | 114514 |
 
 > 非专业人员勿用。
 
 ### sign
 
 ```kotlin
-# http://127.0.0.1:8080/sign?uin=[UIN]&qua=[QUA]&cmd=[CMD]&seq=[SEQ]&buffer=[BUFFER]
+# http://host:port/sign?uin=[UIN]&qua=[QUA]&cmd=[CMD]&seq=[SEQ]&buffer=[BUFFER]
 ```
-|参数名|意义|例子|
-|-----|-----|-----|
-|UIN|Bot的QQ号|114514|
-|QUA|QQ User-Agent，与QQ版本有关|V1_AND_SQ_8.9.63_4188_HDBM_T|
-|CMD|指令类型，CMD有很多种，目前登录、发信息均需要sign|wtlogin.login|
-|SEQ|数据包序列号，用于指示请求的序列或顺序。它是一个用于跟踪请求的顺序的数值，确保请求按正确的顺序处理|2333|
-|BUFFER|数据包包体，不需要长度，将byte数组转换为HEX发送|020348010203040506|
+| 参数名    | 意义                                                | 例子                          |
+|--------|---------------------------------------------------|-----------------------------|
+| UIN    | Bot的QQ号                                           | 114514                      |
+| QUA    | QQ User-Agent，与QQ版本有关                             | V1_AND_SQ_8.9.68_4264_YYB_D |
+| CMD    | 指令类型，CMD有很多种，目前登录、发信息均需要sign                      | wtlogin.login               |
+| SEQ    | 数据包序列号，用于指示请求的序列或顺序。它是一个用于跟踪请求的顺序的数值，确保请求按正确的顺序处理 | 2333                        |
+| BUFFER | 数据包包体，不需要长度，将byte数组转换为HEX发送                       | 020348010203040506          |
 
 <details>
 <summary>POST的支持</summary>
@@ -269,15 +245,15 @@ POST的内容："uin=" + uin + "&qua=" + qua + "&cmd=" + cmd + "&seq=" + seq + "
 下面这个只是个例子
 
 ```kotlin
-# http://127.0.0.1:8080/energy?version=[VERSION]&uin=[UIN]&guid=[GUID]&data=[DATA]
+# http://host:port/energy?version=[VERSION]&uin=[UIN]&guid=[GUID]&data=[DATA]
 ```
 
-|参数名|意义|例子|
-|-----|-----|-----|
-|VERSION|**注意！**这里的VERSION指的**不是QQ的版本号，而是SDK Version**，可以在QQ安装包中找到此信息|6.0.0.2549|
-|UIN|Bot的QQ号|114514|
-|GUID|登录设备的GUID，将byte数组转换为HEX发送，必须是32长度的HEX字符串|ABCDABCDABCDABCDABCDABCDABCDABCD|
-|DATA|QQ发送登录包的CmdId和SubCmdId，例子中810是登陆CmdId，9是SubCmdId|810_9|
+| 参数名     | 意义                                                           | 例子                               |
+|---------|--------------------------------------------------------------|----------------------------------|
+| VERSION | **注意！**这里的VERSION指的**不是QQ的版本号，而是SDK Version**，可以在QQ安装包中找到此信息 | 6.0.0.2549                       |
+| UIN     | Bot的QQ号                                                      | 114514                           |
+| GUID    | 登录设备的GUID，将byte数组转换为HEX发送，必须是32长度的HEX字符串                     | ABCDABCDABCDABCDABCDABCDABCDABCD |
+| DATA    | QQ发送登录包的CmdId和SubCmdId，例子中810是登陆CmdId，9是SubCmdId             | 810_9                            |
 
 # 其他
 - 由于项目的特殊性，我们可能~~随时删除本项目~~且不会做出任何声明
