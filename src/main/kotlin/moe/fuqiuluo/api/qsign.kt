@@ -15,7 +15,6 @@ import moe.fuqiuluo.comm.EnvData
 import moe.fuqiuluo.ext.*
 import moe.fuqiuluo.unidbg.session.SessionManager
 
-
 fun Routing.sign() {
     get("/sign") {
         val uin = fetchGet("uin")!!
@@ -25,9 +24,8 @@ fun Routing.sign() {
         val buffer = fetchGet("buffer")!!.hex2ByteArray()
         val qimei36 = fetchGet("qimei36", def = "")!!
 
-        // I hope the androidId and guid can be null,but the fetchGet() can not work
-        val androidId = call.parameters["android_id"] ?: ""
-        val guid = call.parameters["guid"] ?: ""
+        val androidId = fetchGet("android_id", def = "")!!
+        val guid = fetchGet("guid", def = "")!!
 
         requestSign(cmd, uin, qua, seq, buffer, qimei36, androidId, guid)
     }
@@ -40,8 +38,10 @@ fun Routing.sign() {
         val seq = fetchPost(param, "seq")!!.toInt()
         val buffer = fetchPost(param, "buffer")!!.hex2ByteArray()
         val qimei36 = fetchPost(param, "qimei36", def = "")!!
+
         val androidId = param["android_id"] ?: ""
         val guid = param["guid"] ?: ""
+
         requestSign(cmd, uin, qua, seq, buffer, qimei36, androidId, guid)
     }
 }
@@ -73,7 +73,7 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.requestSign(
             EnvData(
                 uin.toLong(),
                 androidId,
-                guid,
+                guid.lowercase(),
                 qimei36,
                 qua,
                 CONFIG.protocol.version,
