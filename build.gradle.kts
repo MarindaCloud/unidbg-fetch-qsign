@@ -1,3 +1,6 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import kotlin.system.exitProcess
+
 val ktor_version: String by project
 val logback_version: String by project
 
@@ -9,7 +12,7 @@ plugins {
 }
 
 group = "moe.fuqiuluo"
-version = "1.1.5"
+version = "1.1.6"
 
 repositories {
     mavenCentral()
