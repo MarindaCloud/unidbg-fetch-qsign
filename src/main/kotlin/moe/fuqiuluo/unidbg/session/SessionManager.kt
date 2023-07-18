@@ -26,5 +26,6 @@ object SessionManager {
 
     fun close(uin: Long) {
         sessionMap[uin]?.vm?.destroy()
+        sessionMap.remove(uin)
     }
 }

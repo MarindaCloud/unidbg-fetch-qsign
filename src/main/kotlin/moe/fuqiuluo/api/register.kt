@@ -33,4 +33,20 @@ fun Routing.register() {
             throw WrongKeyError
         }
     }
+
+    get("/destroy") {
+        val uin = fetchGet("uin")!!.toLong()
+        val key = fetchGet("key")!!
+
+        if (key == CONFIG.key) {
+           if(uin in SessionManager){
+                SessionManager.close(uin)
+                call.respond(APIResult(0,  "Instance destroyed successfully.", ""))
+              } else {
+                call.respond(APIResult(0,  "Instance does not exist.", ""))
+           }
+        } else {
+            throw WrongKeyError
+        }
+    }
 }
