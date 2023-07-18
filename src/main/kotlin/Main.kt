@@ -61,6 +61,7 @@ fun Application.init() {
         json(Json {
             prettyPrint = true
             isLenient = true
+            ignoreUnknownKeys = true
         })
     }
     install(StatusPages) {
