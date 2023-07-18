@@ -5,7 +5,6 @@
   },
   "key": "114514",
   "auto_register": true,
-  "reload_interval": 40,
   "protocol": {
     "qua": "V1_AND_SQ_8.9.70_4292_HDBM_T",
     "version": "8.9.70",
@@ -14,6 +13,6 @@
   "unidbg": {
     "dynarmic": false,
     "unicorn": true,
-    "debug": true
+    "debug": false
   }
 }
