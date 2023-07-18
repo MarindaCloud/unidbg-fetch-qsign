@@ -151,9 +151,6 @@ class QSecJni(
         signature: String,
         vaList: VaList
     ): DvmObject<*> {
-        if (signature == "com/tencent/mobileqq/qsec/qsecest/QsecEst->p(Landroid/content/Context;I)Ljava/lang/String;") {
-            //vm.addNotFoundClass()
-        }
         if (signature == "com/tencent/mobileqq/dt/app/Dtc->mmKVValue(Ljava/lang/String;)Ljava/lang/String;") {
             return StringObject(
                 vm, when (val key = vaList.getObjectArg<StringObject>(0).value) {
