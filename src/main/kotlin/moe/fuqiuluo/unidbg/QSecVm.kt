@@ -32,6 +32,8 @@ class QSecVM(
             memory.setLibraryResolver(resolver)
             emulator.syscallHandler.addIOResolver(resolver)
             vm.setJni(QSecJni(envData, this, global))
+            vm.addNotFoundClass("com/tencent/mobileqq/dt/Dc")
+
         }.onFailure {
             it.printStackTrace()
         }

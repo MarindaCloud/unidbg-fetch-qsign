@@ -43,13 +43,17 @@ data class UnidbgConfig(
 data class QSignConfig(
     var server: Server,
     var key: String,
-    @JsonNames("reloadInterval", "reload_interval")
-    var reloadInterval: Int,
+    @JsonNames("autoRegister", "auto_register")
+    var autoRegister:Boolean,
+    //@JsonNames("reloadInterval", "reload_interval")
+    //var reloadInterval: Int,
     var protocol: Protocol,
     var unidbg: UnidbgConfig,
+    @JsonNames("blackList", "black_list")
+    var blackList: List<Long>? = null
 )
 
 fun QSignConfig.checkIllegal() {
     require(server.port in 1 .. 65535) { "Port is out of range." }
-    require(reloadInterval in 20 .. 50) { "ReloadInterval is out of range." }
+    //require(reloadInterval in 20 .. 50) { "ReloadInterval is out of range." }
 }

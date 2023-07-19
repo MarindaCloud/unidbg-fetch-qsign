@@ -19,7 +19,7 @@ fun Routing.register() {
 
         val qua = fetchGet("qua", CONFIG.protocol.qua)!!
         val version = fetchGet("version", CONFIG.protocol.version)!!
-        val code = fetchGet("qua", CONFIG.protocol.code)!!
+        val code = fetchGet("code", CONFIG.protocol.code)!!
 
         val hasRegister = uin in SessionManager
         if (key == CONFIG.key) {
@@ -29,6 +29,22 @@ fun Routing.register() {
             } else {
                 call.respond(APIResult(0,  "Instance loaded successfully.", ""))
             }
+        } else {
+            throw WrongKeyError
+        }
+    }
+
+    get("/destroy") {
+        val uin = fetchGet("uin")!!.toLong()
+        val key = fetchGet("key")!!
+
+        if (key == CONFIG.key) {
+           if(uin in SessionManager){
+                SessionManager.close(uin)
+                call.respond(APIResult(0,  "Instance destroyed successfully.", ""))
+              } else {
+                call.respond(APIResult(0,  "Instance does not exist.", ""))
+           }
         } else {
             throw WrongKeyError
         }

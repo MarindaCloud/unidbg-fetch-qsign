@@ -4,15 +4,18 @@
     "port": 8080
   },
   "key": "114514",
-  "reload_interval": 40,
+  "auto_register": true,
   "protocol": {
-    "qua": "V1_AND_SQ_8.9.68_4218_HDBM_T",
+    "qua": "V1_AND_SQ_8.9.68_4264_YYB_D",
     "version": "8.9.68",
-    "code": "4218"
+    "code": "4264"
   },
   "unidbg": {
     "dynarmic": false,
     "unicorn": true,
-    "debug": false
-  }
+    "debug": true
+  },
+  "black_list": [
+    1008611
+  ]
 }

@@ -1,5 +1,7 @@
 package moe.fuqiuluo.unidbg.session
 
+import CONFIG
+import moe.fuqiuluo.api.BlackListError
 import moe.fuqiuluo.comm.EnvData
 import java.util.concurrent.ConcurrentHashMap
 
@@ -13,6 +15,9 @@ object SessionManager {
     operator fun contains(uin: Long) = sessionMap.containsKey(uin)
 
     fun register(envData: EnvData) {
+        if (CONFIG.blackList?.contains(envData.uin) == true) {
+            throw BlackListError
+        }
         if (envData.uin in this) {
             close(envData.uin)
         }
@@ -21,5 +26,6 @@ object SessionManager {
 
     fun close(uin: Long) {
         sessionMap[uin]?.vm?.destroy()
+        sessionMap.remove(uin)
     }
 }

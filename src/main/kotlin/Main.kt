@@ -49,11 +49,11 @@ fun main(args: Array<String>) {
                 .apply { checkIllegal() }
         }
     }
-
     CONFIG.server.also {
         embeddedServer(Netty, host = it.host, port = it.port, module = Application::init)
         .start(wait = true)
     }
+
 }
 
 fun Application.init() {
@@ -61,6 +61,7 @@ fun Application.init() {
         json(Json {
             prettyPrint = true
             isLenient = true
+            ignoreUnknownKeys = true
         })
     }
     install(StatusPages) {
