@@ -9,54 +9,7 @@
 
 # 部署方法
 
-[Wiki](https://github.com/fuqiuluo/unidbg-fetch-qsign/wiki)
-
-## Docker部署
-
-[Dockerhub: xzhouqd/qsign](https://hub.docker.com/r/xzhouqd/qsign)
-
-此Docker image相关提问请到：[xzhouqd/unidbg-fetch-qsign](https://github.com/XZhouQD/unidbg-fetch-qsign) 提交issue
-
-## docker-compose部署
-
-```Dockerfile
-FROM openjdk:22-slim-bookworm
-WORKDIR /code
-
-# >>>>>>切换镜像源
-RUN echo "deb http://mirrors.cernet.edu.cn/debian/ bookworm main contrib non-free non-free-firmware" > /etc/apt/sources.list && \
-    echo "deb http://mirrors.cernet.edu.cn/debian/ bookworm-updates main contrib non-free non-free-firmware" >> /etc/apt/sources.list && \
-    echo "deb http://mirrors.cernet.edu.cn/debian/ bookworm-backports main contrib non-free non-free-firmware" >> /etc/apt/sources.list && \
-    echo "deb http://mirrors.cernet.edu.cn/debian-security bookworm-security main contrib non-free non-free-firmware" >> /etc/apt/sources.list && \
-    rm -r /etc/apt/sources.list.d
-# <<<<<<
-
-RUN apt-get update
-RUN apt-get install -y wget unzip
-
-# 下载unidbg-fetch-qsign,可以自己选择想要的版本
-RUN wget -O sign.zip https://github.com/fuqiuluo/unidbg-fetch-qsign/releases/download/1.1.5/qsign-1.1.5.onejar.zip && \
-    unzip sign.zip
-
-# 在这里要选好QQ协议的版本
-CMD [ "bash","/code/unidbg-fetch-qsign-shadow-1.1.5/bin/unidbg-fetch-qsign","--basePath=/code/unidbg-fetch-qsign-shadow-1.1.5/txlib/8.9.63"]
-  
-```
-
-```yaml
-version: '2'
-
-services:
-  qsign:
-    # 填写Dockerfile所在目录
-    build: .
-    environment:
-      TZ: Asia/Shanghai
-    restart: always
-    ports:
-      # 按需调整端口映射
-      - 8901:8080
-```
+**[Wiki](https://github.com/fuqiuluo/unidbg-fetch-qsign/wiki)**
 
 # 你可能需要的项目
 
