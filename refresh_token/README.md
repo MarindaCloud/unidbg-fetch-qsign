@@ -113,8 +113,8 @@ http://host:port/destroy?uin=[QQ]&key=[key]
 
 ```json5
 {
-    "code": 0,
+    "code": 1,
     "msg": "Instance does not exist.",
-    "data": ""
+    "data": "failed"
 }
 ```
