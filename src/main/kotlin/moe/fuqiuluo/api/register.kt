@@ -5,6 +5,7 @@ import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import moe.fuqiuluo.comm.EnvData
+import moe.fuqiuluo.ext.failure
 import moe.fuqiuluo.ext.fetchGet
 import moe.fuqiuluo.unidbg.session.SessionManager
 
@@ -43,7 +44,7 @@ fun Routing.register() {
                 SessionManager.close(uin)
                 call.respond(APIResult(0,  "Instance destroyed successfully.", ""))
               } else {
-                call.respond(APIResult(0,  "Instance does not exist.", ""))
+                  failure(1, "Instance does not exist.")
            }
         } else {
             throw WrongKeyError
