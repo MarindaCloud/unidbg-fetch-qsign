@@ -19,27 +19,42 @@
 
 ## docker-compose部署
 
-直接使用openjdk11启动服务
+```Dockerfile
+FROM openjdk:22-slim-bookworm
+WORKDIR /code
+
+# >>>>>>切换镜像源
+RUN echo "deb http://mirrors.cernet.edu.cn/debian/ bookworm main contrib non-free non-free-firmware" > /etc/apt/sources.list && \
+    echo "deb http://mirrors.cernet.edu.cn/debian/ bookworm-updates main contrib non-free non-free-firmware" >> /etc/apt/sources.list && \
+    echo "deb http://mirrors.cernet.edu.cn/debian/ bookworm-backports main contrib non-free non-free-firmware" >> /etc/apt/sources.list && \
+    echo "deb http://mirrors.cernet.edu.cn/debian-security bookworm-security main contrib non-free non-free-firmware" >> /etc/apt/sources.list && \
+    rm -r /etc/apt/sources.list.d
+# <<<<<<
+
+RUN apt-get update
+RUN apt-get install -y wget unzip
+
+# 下载unidbg-fetch-qsign,可以自己选择想要的版本
+RUN wget -O sign.zip https://github.com/fuqiuluo/unidbg-fetch-qsign/releases/download/1.1.5/qsign-1.1.5.onejar.zip && \
+    unzip sign.zip
+
+# 在这里要选好QQ协议的版本
+CMD [ "bash","/code/unidbg-fetch-qsign-shadow-1.1.5/bin/unidbg-fetch-qsign","--basePath=/code/unidbg-fetch-qsign-shadow-1.1.5/txlib/8.9.63"]
+  
+```
 
 ```yaml
 version: '2'
 
 services:
   qsign:
-    image: openjdk:11.0-jdk
+    # 填写Dockerfile所在目录
+    build: .
     environment:
       TZ: Asia/Shanghai
     restart: always
-    working_dir: /app
-    # 按需修改相关参数
-    command: bash bin/unidbg-fetch-qsign --basePath=txlib/8.9.68
-    volumes:
-      # 当前目录放置qsign的解压包
-      - ./unidbg-fetch-qsign:/app
-      # 当前目录放置txlib
-      - ./txlib:/app/txlib
     ports:
-      # 按需调整宿主机端口
+      # 按需调整端口映射
       - 8901:8080
 ```
 
