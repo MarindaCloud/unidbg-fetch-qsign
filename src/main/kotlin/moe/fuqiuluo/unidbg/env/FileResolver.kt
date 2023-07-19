@@ -13,6 +13,7 @@ import moe.fuqiuluo.unidbg.QSecVM
 import moe.fuqiuluo.unidbg.env.files.fetchStat
 import moe.fuqiuluo.unidbg.env.files.fetchStatus
 import java.io.File
+import java.util.UUID
 import java.util.logging.Logger
 
 class FileResolver(
@@ -20,6 +21,7 @@ class FileResolver(
     vm: QSecVM
 ): AndroidResolver(sdk) {
     private val tmpFilePath = vm.coreLibPath
+    private val uuid = UUID.randomUUID()
 
     override fun resolve(emulator: Emulator<AndroidFileIO>, path: String, oflags: Int): FileResult<AndroidFileIO>? {
         val result = super.resolve(emulator, path, oflags)
@@ -37,6 +39,9 @@ class FileResolver(
         }
 
 
+        if (path == "/proc/sys/kernel/random/boot_id") {
+            return FileResult.success(ByteArrayFileIO(oflags, path, uuid.toString().toByteArray()))
+        }
         if (path == "/proc/self/status") {
             return FileResult.success(ByteArrayFileIO(oflags, path, fetchStatus(emulator.pid).toByteArray()))
         }
@@ -81,6 +86,10 @@ class FileResolver(
             return FileResult.success(DirectoryFileIO(oflags, path,
                 DirectoryFileIO.DirectoryEntry(false, emulator.pid.toString()),
             ))
+        }
+
+        if (path == "/proc/meminfo" || path == "/proc/cpuinfo") {
+            return FileResult.failed(UnixEmulator.EACCES)
         }
 
         if (path == "/proc/${emulator.pid}/cmdline"
