@@ -5,6 +5,7 @@ import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import moe.fuqiuluo.comm.EnvData
+import moe.fuqiuluo.ext.failure
 import moe.fuqiuluo.ext.fetchGet
 import moe.fuqiuluo.unidbg.session.SessionManager
 
@@ -29,6 +30,22 @@ fun Routing.register() {
             } else {
                 call.respond(APIResult(0,  "Instance loaded successfully.", ""))
             }
+        } else {
+            throw WrongKeyError
+        }
+    }
+
+    get("/destroy") {
+        val uin = fetchGet("uin")!!.toLong()
+        val key = fetchGet("key")!!
+
+        if (key == CONFIG.key) {
+           if(uin in SessionManager){
+                SessionManager.close(uin)
+                call.respond(APIResult(0,  "Instance destroyed successfully.", ""))
+              } else {
+                  failure(1, "Instance does not exist.")
+           }
         } else {
             throw WrongKeyError
         }

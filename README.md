@@ -9,39 +9,7 @@
 
 # 部署方法
 
-[Wiki](https://github.com/fuqiuluo/unidbg-fetch-qsign/wiki)
-
-## Docker部署
-
-[Dockerhub: xzhouqd/qsign](https://hub.docker.com/r/xzhouqd/qsign)
-
-此Docker image相关提问请到：[xzhouqd/unidbg-fetch-qsign](https://github.com/XZhouQD/unidbg-fetch-qsign) 提交issue
-
-## docker-compose部署
-
-直接使用openjdk11启动服务
-
-```yaml
-version: '2'
-
-services:
-  qsign:
-    image: openjdk:11.0-jdk
-    environment:
-      TZ: Asia/Shanghai
-    restart: always
-    working_dir: /app
-    # 按需修改相关参数
-    command: bash bin/unidbg-fetch-qsign --basePath=txlib/8.9.68
-    volumes:
-      # 当前目录放置qsign的解压包
-      - ./unidbg-fetch-qsign:/app
-      # 当前目录放置txlib
-      - ./txlib:/app/txlib
-    ports:
-      # 按需调整宿主机端口
-      - 8901:8080
-```
+**[Wiki](https://github.com/fuqiuluo/unidbg-fetch-qsign/wiki)**
 
 # 你可能需要的项目
 
