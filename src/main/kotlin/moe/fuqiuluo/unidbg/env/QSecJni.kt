@@ -136,11 +136,17 @@ class QSecJni(
     }
 
     override fun acceptMethod(dvmClass: DvmClass, signature: String, isStatic: Boolean): Boolean {
-        if (CONFIG.unidbg.debug) {
-            println("Accept ${ if (isStatic) "static" else "" } ${dvmClass.className}.$signature")
-        }
         if (signature == "com/tencent/mobileqq/qsec/qsecest/QsecEst->p(Landroid/content/Context;I)Ljava/lang/String;") {
             return false
+        }
+        if (signature == "com/tencent/qqprotect/qsec/QSecFramework->goingUp(JJJJLjava/lang/Object;Ljava/lang/Object;[Ljava/lang/Object;[Ljava/lang/Object;)I") {
+            return false
+        }
+        if (signature == "com/tencent/mobileqq/qsec/qsecest/QsecEst->p(Landroid/content/Context;I)Ljava/lang/String") {
+            return false
+        }
+        if (CONFIG.unidbg.debug) {
+            println("Accept ${ if (isStatic) "static" else "" } $signature")
         }
         return super.acceptMethod(dvmClass, signature, isStatic)
     }
