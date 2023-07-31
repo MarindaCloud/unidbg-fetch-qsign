@@ -4,16 +4,16 @@
     "port": 8080
   },
   "key": "114514",
-  "auto_register": false,
+  "auto_register": true,
   "protocol": {
-    "qua": "V1_AND_SQ_8.9.70_4330_YYB_D",
-    "version": "8.9.70",
-    "code": "4330"
+    "qua": "V1_AND_SQ_8.9.71_4332_YYB_D",
+    "version": "8.9.71",
+    "code": "4332"
   },
   "unidbg": {
     "dynarmic": false,
     "unicorn": true,
-    "debug": false
+    "debug": true
   },
   "black_list": [
     1008611

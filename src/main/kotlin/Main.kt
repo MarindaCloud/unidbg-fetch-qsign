@@ -43,8 +43,10 @@ fun main(args: Array<String>) {
         } else {
             val json = Json { ignoreUnknownKeys = true }
             FEBound.initAssertConfig(baseDir)
+            println("FEBond sum = ${FEBound.checkCurrent()}")
             CONFIG = json.decodeFromString<QSignConfig>(baseDir.resolve("config.json").readText())
                 .apply { checkIllegal() }
+
         }
     }
     CONFIG.server.also {

@@ -105,6 +105,20 @@ public class FEBound {
         }
     }
 
+    public static int checkCurrent() {
+        int tmp = 0;
+        for (byte[] bytes : mConfigEnCode) {
+            for (byte aByte : bytes) {
+                tmp += aByte;
+            }
+        }
+        for (byte[] bytes : mConfigDeCode) {
+            for (byte aByte : bytes) {
+                tmp += aByte;
+            }
+        }
+        return tmp;
+    }
 
     public static byte[] transform(int i, byte[] bArr) {
         try {
