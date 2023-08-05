@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - 'master'
-      - 'dev'
     # Sequence of patterns matched against refs/tags
     tags:
       - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
@@ -78,4 +77,3 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64,linux/arm64
-#          ,linux/arm/v7,linux/ppc64le,linux/s390x
