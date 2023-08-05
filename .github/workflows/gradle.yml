@@ -9,8 +9,16 @@ name: Java CI with Gradle
 
 on:
   push:
+    paths-ignore:
+      - ".github/**"
+      - ".run/**"
+      - "**/*.md"
     branches: [ "master" ]
   pull_request:
+    paths-ignore:
+      - ".github/**"
+      - ".run/**"
+      - "**/*.md"
     branches: [ "master" ]
 
 permissions:
