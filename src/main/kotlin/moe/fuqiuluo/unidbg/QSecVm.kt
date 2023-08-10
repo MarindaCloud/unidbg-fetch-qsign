@@ -18,10 +18,6 @@ class QSecVM(
     dynarmic: Boolean,
     unicorn: Boolean
 ): Destroyable, AndroidVM("com.tencent.mobileqq", dynarmic, unicorn) {
-    companion object {
-        private val logger = LoggerFactory.getLogger(QSecVM::class.java)!!
-    }
-
     private var destroy: Boolean = false
     private var isInit: Boolean = false
     internal val global = GlobalData()
@@ -33,6 +29,7 @@ class QSecVM(
             emulator.syscallHandler.addIOResolver(resolver)
             vm.setJni(QSecJni(envData, this, global))
             vm.addNotFoundClass("com/tencent/mobileqq/dt/Dc")
+            vm.addNotFoundClass("com/tencent/mobileqq/dt/Dte")
 
         }.onFailure {
             it.printStackTrace()
