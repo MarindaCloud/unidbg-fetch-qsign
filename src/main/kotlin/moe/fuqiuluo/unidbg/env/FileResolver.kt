@@ -10,6 +10,8 @@ import com.github.unidbg.linux.file.SimpleFileIO
 import com.github.unidbg.unix.UnixEmulator
 import moe.fuqiuluo.ext.hex2ByteArray
 import moe.fuqiuluo.unidbg.QSecVM
+import moe.fuqiuluo.unidbg.env.files.fetchCpuInfo
+import moe.fuqiuluo.unidbg.env.files.fetchMemInfo
 import moe.fuqiuluo.unidbg.env.files.fetchStat
 import moe.fuqiuluo.unidbg.env.files.fetchStatus
 import java.io.File
@@ -55,6 +57,12 @@ class FileResolver(
         }
         if (path == "/proc/stat") {
             return FileResult.success(ByteArrayFileIO(oflags, path, fetchStat()))
+        }
+        if (path == "/proc/meminfo") {
+            return FileResult.success(ByteArrayFileIO(oflags, path, fetchMemInfo()))
+        }
+        if (path == "/proc/cpuinfo") {
+            return FileResult.success(ByteArrayFileIO(oflags, path, fetchCpuInfo()))
         }
         if (path == "/dev/__properties__") {
             return FileResult.success(DirectoryFileIO(oflags, path,
@@ -104,10 +112,6 @@ class FileResolver(
             return FileResult.success(DirectoryFileIO(oflags, path,
                 DirectoryFileIO.DirectoryEntry(true, "libfekit.so"),
             ))
-        }
-
-        if (path == "/proc/meminfo" || path == "/proc/cpuinfo") {
-            return FileResult.failed(UnixEmulator.EACCES)
         }
 
         if (path == "/proc/${emulator.pid}/cmdline"
