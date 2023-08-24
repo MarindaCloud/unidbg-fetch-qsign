@@ -70,7 +70,7 @@ fun Routing.energy() {
                 val version = fetchGet("version",  err = "lack of version") ?: return@get
                 val guid = (fetchGet("guid", err = "lack of guid") ?: return@get).hex2ByteArray()
                 val sub = data.substring(4).toInt(16)
-                val salt = ByteBuffer.allocate(8 + 2 + guid.size + 2 + 10)
+                val salt = ByteBuffer.allocate(8 + 2 + guid.size + 2 + 10 + 4)
                 salt.putLong(uin)
                 salt.putShort(guid.size.toShort())
                 salt.put(guid)
