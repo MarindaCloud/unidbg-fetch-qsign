@@ -319,7 +319,7 @@ class QSecJni(
                 75 -> Random.nextInt(0 .. 500000).toString()
                 76 -> "1,20,50"
                 77 -> (1024 * 1024 * 1024 * 32).toString()
-                78 -> "su" // su Bin
+                78 -> "0" // su Bin
                 79 -> "1.1.2"
                 81 -> "zh"
                 82 -> "90721e0b3aaa7f77503b6abedd960c2e".uppercase()

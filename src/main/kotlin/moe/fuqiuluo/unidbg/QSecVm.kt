@@ -30,6 +30,7 @@ class QSecVM(
             vm.setJni(QSecJni(envData, this, global))
 
             if (envData.packageName == "com.tencent.mobileqq") {
+                println("QSign-Unidbg 白名单模式")
                 vm.setWhiteMode(true)
                 arrayOf(
                     "android/os/Build\$VERSION",
