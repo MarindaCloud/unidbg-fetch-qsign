@@ -194,6 +194,14 @@ class FileResolver(
             return FileResult.success(SimpleFileIO(oflags, tmpFilePath.resolve("libfekit.so"), path))
         }
 
+        if (path == "/data/app/~~vbcRLwPxS0GyVfqT-nCYrQ==/${vm.envData.packageName}-xJKJPVp9lorkCgR_w5zhyA==/lib/arm64/libwtecdh.so") {
+            tmpFilePath.resolve("libwtecdh.so").let {
+                if (it.exists()) {
+                    return FileResult.success(SimpleFileIO(oflags, it, path))
+                }
+            }
+        }
+
         if (path == "/system/bin/sh" || path == "/system/bin/ls" || path == "/system/lib/libc.so") {
             return FileResult.success(ByteArrayFileIO(oflags, path, byteArrayOf(0x7f, 0x45, 0x4c, 0x46, 0x02, 0x01, 0x01, 0x00)))
         }
