@@ -21,19 +21,19 @@ data class EnvData(
     var guid: String,
     var qimei36: String,
 
-    var packageName: String = CONFIG.protocol.packageName ?: "com.tencent.mobileqq",
     var qua: String = CONFIG.protocol.qua,
     var version: String = CONFIG.protocol.version,
-    var code: String = CONFIG.protocol.code
+    var code: String = CONFIG.protocol.code,
+    var packageName: String = CONFIG.protocol.packageName ?: "com.tencent.mobileqq",
 )
 
 @Serializable
 data class Protocol(
-    @SerialName("package_name")
-    var packageName: String? = null,
     var qua: String,
     var version: String,
-    var code: String
+    var code: String,
+    @SerialName("package_name")
+    var packageName: String? = null,
 )
 
 @Serializable

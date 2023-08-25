@@ -43,6 +43,8 @@ private suspend inline fun <T> Mutex.withLockAndTimeout(timeout: Long, action: (
             job.cancel()
         }
     } finally {
-        unlock()
+        try {
+            unlock()
+        } catch (e: java.lang.Exception) {}
     }
 }

@@ -7,6 +7,7 @@ import com.github.unidbg.linux.android.dvm.*
 import com.github.unidbg.linux.android.dvm.array.ArrayObject
 import com.tencent.mobileqq.channel.SsoPacket
 import com.tencent.mobileqq.dt.model.FEBound
+import com.tencent.mobileqq.qsec.qsecest.SelfBase64
 import com.tencent.mobileqq.qsec.qsecurity.DeepSleepDetector
 import com.tencent.mobileqq.sign.QQSecuritySign
 import kotlinx.coroutines.sync.Mutex
@@ -16,7 +17,10 @@ import moe.fuqiuluo.unidbg.QSecVM
 import moe.fuqiuluo.unidbg.vm.GlobalData
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.security.SecureRandom
 import java.util.*
+import kotlin.random.Random
+import kotlin.random.nextInt
 
 private val logger = LoggerFactory.getLogger(QSecJni::class.java)
 
@@ -29,14 +33,14 @@ class QSecJni(
 ) : AbstractJni() {
     override fun getStaticIntField(vm: BaseVM, dvmClass: DvmClass, signature: String): Int {
         if (signature == "android/os/Build\$VERSION->SDK_INT:I") {
-            return 23
+            return 26
         }
         return super.getStaticIntField(vm, dvmClass, signature)
     }
 
     override fun getIntField(vm: BaseVM, dvmObject: DvmObject<*>, signature: String): Int {
         if (signature == "android/content/pm/ApplicationInfo->targetSdkVersion:I") {
-            return 26
+            return 29
         }
         return super.getIntField(vm, dvmObject, signature)
     }
@@ -135,22 +139,6 @@ class QSecJni(
         return super.callIntMethodV(vm, dvmObject, signature, vaList)
     }
 
-    override fun acceptMethod(dvmClass: DvmClass, signature: String, isStatic: Boolean): Boolean {
-        if (signature == "com/tencent/mobileqq/qsec/qsecest/QsecEst->p(Landroid/content/Context;I)Ljava/lang/String;") {
-            return false
-        }
-        if (signature == "com/tencent/qqprotect/qsec/QSecFramework->goingUp(JJJJLjava/lang/Object;Ljava/lang/Object;[Ljava/lang/Object;[Ljava/lang/Object;)I") {
-            return false
-        }
-        if (signature == "com/tencent/mobileqq/qsec/qsecest/QsecEst->p(Landroid/content/Context;I)Ljava/lang/String") {
-            return false
-        }
-        if (CONFIG.unidbg.debug) {
-            println("Accept ${ if (isStatic) "static" else "" } $signature")
-        }
-        return super.acceptMethod(dvmClass, signature, isStatic)
-    }
-
     override fun callStaticObjectMethodV(
         vm: BaseVM,
         dvmClass: DvmClass,
@@ -210,7 +198,7 @@ class QSecJni(
                     "ro.hardware" -> "qcom"
                     "ro.product.cpu.abilist" -> "arm64-v8a, armeabi-v7a, armeabi"
                     "ro.build.version.incremental" -> "V14.0.18.0.CNMLGB"
-                    "ro.build.version.release" -> "12"
+                    "ro.build.version.release" -> "8.0"
                     "ro.build.version.base_os", "ro.boot.container", "ro.vendor.build.fingerprint", "ro.build.expect.bootloader", "ro.build.expect.baseband" -> ""
                     "ro.build.version.security_patch" -> "2077-2-29"
                     "ro.build.version.preview_sdk" -> "0"
@@ -294,6 +282,60 @@ class QSecJni(
             return vm.resolveClass("java/lang/Thread").newObject(null)
         }
 
+        if (signature == "com/tencent/mobileqq/qsec/qsecest/QsecEst->p(Landroid/content/Context;I)Ljava/lang/String;") {
+            val id = vaList.getIntArg(1)
+            return StringObject(vm, when (id) {
+                0 -> "26"
+                1 -> "k1"
+                23 -> "8" // CPU数量
+                25 -> "0.0.12"
+                26 -> "90721e0b3a587f77503b6abedd960c2e" // 签名md5
+                27 -> "0"  // 是否有xposed
+                28 -> envData.packageName
+                31 -> "0" // 是否锁屏
+                41 -> "" // Hardware
+                42 -> "WiFi"
+                43 -> envData.packageName
+                44 -> "1919810" // 剩余内存
+                45 -> "114514" // 磁盘大小
+                46 -> "0" // 是否有qemu环境
+                47 -> "0" // 是否存在qemu文件
+                48 -> "0" // 是否处于代理状态
+                49 -> "0" // SU
+                50 -> "1145141919"
+                51 -> envData.version
+                52 -> envData.code
+                68 -> "0" // VPN
+                70 -> "java.agent"
+                80, 71 -> "Asia/Shanghai"
+                72 -> "800,1217"
+                73 -> "8.0"
+                74 -> "200" // screen_brightness
+                75 -> Random.nextInt(0 .. 500000).toString()
+                76 -> "1,20,50"
+                77 -> (1024 * 1024 * 1024 * 32).toString()
+                78 -> "su" // su Bin
+                79 -> "1.1.2"
+                81 -> "zh"
+                82 -> "90721e0b3aaa7f77503b6abedd960c2e"
+                83 -> "0"
+                86 -> fun(): String {
+                    val data = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toCharArray()
+                    val secureRandom = SecureRandom()
+                    val sb = StringBuilder(32)
+                    for (i2 in 0 until 32) {
+                        sb.append(data[secureRandom.nextInt(data.size)])
+                    }
+                    return sb.toString()
+                }()
+                87 -> "0" // busy box
+                88 -> "0" // magisk
+                89 -> System.currentTimeMillis().toString()
+                in 90 .. 105 -> "0"
+                else -> error("不支持的QSecEstInfo ID: $id")
+            })
+        }
+
         return super.callStaticObjectMethodV(vm, dvmClass, signature, vaList)
     }
 
@@ -364,7 +406,36 @@ class QSecJni(
         if ("java/lang/Thread->getStackTrace()[Ljava/lang/StackTraceElement;" == signature) {
             return ArrayObject()
         }
+        if ("com/tencent/mobileqq/qsec/qsecurity/QSec->getEstInfo()Ljava/lang/String;" == signature) {
+            val est = global["est_data"] as? com.github.unidbg.linux.android.dvm.array.ByteArray
+            return if (est == null || est.value == null) {
+                StringObject(vm, "e_null")
+            } else {
+                val byteArray = est.value
+                val b64 = SelfBase64.Encoder.RFC4648.encodeToString(byteArray)
+                StringObject(vm, b64)
+            }
+        }
+        if ("android/content/Context->getExternalFilesDir(Ljava/lang/String;)Ljava/io/File;" == signature) {
+            return vm.resolveClass("java/io/File")
+                .newObject(File("/mnt/sdcard"))
+        }
         return super.callObjectMethodV(vm, dvmObject, signature, vaList)
+    }
+
+    override fun acceptMethod(dvmClass: DvmClass, signature: String, isStatic: Boolean): Boolean {
+        if (signature == "com/tencent/mobileqq/qsec/qsecest/QsecEst->p(Landroid/content/Context;I)Ljava/lang/String;"
+            && envData.packageName == "com.tencent.mobileqq") {
+            return false
+        }
+        if (signature == "com/tencent/qqprotect/qsec/QSecFramework->goingUp(JJJJLjava/lang/Object;Ljava/lang/Object;[Ljava/lang/Object;[Ljava/lang/Object;)I"
+            && envData.packageName == "com.tencent.mobileqq") {
+            return false
+        }
+        if (CONFIG.unidbg.debug) {
+            println("Accept ${ if (isStatic) "static" else "" } $signature")
+        }
+        return super.acceptMethod(dvmClass, signature, isStatic)
     }
 
     override fun newObjectV(vm: BaseVM, dvmClass: DvmClass, signature: String, vaList: VaList): DvmObject<*> {

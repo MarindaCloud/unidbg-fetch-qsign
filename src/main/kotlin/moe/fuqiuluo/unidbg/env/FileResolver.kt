@@ -8,6 +8,7 @@ import com.github.unidbg.linux.file.ByteArrayFileIO
 import com.github.unidbg.linux.file.DirectoryFileIO
 import com.github.unidbg.linux.file.SimpleFileIO
 import com.github.unidbg.unix.UnixEmulator
+import io.ktor.server.config.*
 import moe.fuqiuluo.ext.hex2ByteArray
 import moe.fuqiuluo.unidbg.QSecVM
 import moe.fuqiuluo.unidbg.env.files.fetchCpuInfo
@@ -74,6 +75,12 @@ class FileResolver(
             return FileResult.success(ByteArrayFileIO(oflags, path, byteArrayOf()))
         }
 
+        if (path == "/system/lib") {
+            return FileResult.success(DirectoryFileIO(oflags, path,
+                DirectoryFileIO.DirectoryEntry(true, "libhwui.so"),
+            ))
+        }
+
         if (path == "/data/data/com.tencent.mobileqq") {
             return FileResult.success(DirectoryFileIO(oflags, path,
                 DirectoryFileIO.DirectoryEntry(false, "files"),
@@ -83,7 +90,22 @@ class FileResolver(
             ))
         }
 
-        if (path == "/dev/urandom") {
+        if (path == "/dev/urandom" ||
+            path == "/data/local/su" ||
+            path == "/data/local/bin/su" ||
+            path == "/data/local/xbin/su" ||
+            path == "/sbin/su" ||
+            path == "/su/bin/su" ||
+            path == "/system/bin/su" ||
+            path == "/system/bin/.ext/su" ||
+            path == "/system/bin/failsafe/su" ||
+            path == "/system/sd/xbin/su" ||
+            path == "/system/usr/we-need-root/su" ||
+            path == "/system/xbin/su" ||
+            path == "/cache/su" ||
+            path == "/data/su" ||
+            path == "/dev/su" || path.contains("busybox") || path.contains("magisk")
+            ) {
             return FileResult.failed(UnixEmulator.ENOENT)
         }
 
@@ -102,7 +124,40 @@ class FileResolver(
             || path == "/proc/${emulator.pid}/cmdline"
             || path == "/proc/stat/cmdline" // an error case
         ) {
-            return FileResult.success(ByteArrayFileIO(oflags, path, "${vm.envData.packageName}:MSF".toByteArray()))
+            if (vm.envData.packageName == "com.tencent.tim") {
+                return FileResult.success(ByteArrayFileIO(oflags, path, vm.envData.packageName.toByteArray()))
+            } else {
+                return FileResult.success(ByteArrayFileIO(oflags, path, "${vm.envData.packageName}:MSF".toByteArray()))
+            }
+        }
+
+        if (path == "/data/data") {
+            return FileResult.failed(UnixEmulator.EACCES)
+        }
+
+        if (path.contains("star_est.xml")) {
+            return FileResult.success(ByteArrayFileIO(oflags, path, """
+            <?xml version='1.0' encoding='utf-8' standalone='yes' ?>
+            <map>
+                <string name="id">NS23gm77vjYiyYK554L4aY0SYG5Xgjje</string>
+            </map>
+            """.trimIndent().toByteArray()))
+        }
+
+        if (path == "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq") {
+            return FileResult.success(ByteArrayFileIO(oflags, path, "1804800".toByteArray()))
+        }
+
+        if (path == "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_min_freq") {
+            return FileResult.success(ByteArrayFileIO(oflags, path, "300000".toByteArray()))
+        }
+
+        if (path == "/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq") {
+            return FileResult.success(ByteArrayFileIO(oflags, path, "1670400".toByteArray()))
+        }
+
+        if (path == "/sys/devices/soc0/serial_number") {
+            return FileResult.success(ByteArrayFileIO(oflags, path, "0x0000043be8571339".toByteArray()))
         }
 
         if (path == "/proc") {

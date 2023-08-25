@@ -4,6 +4,7 @@ package moe.fuqiuluo.api
 
 import CONFIG
 import com.tencent.mobileqq.channel.SsoPacket
+import com.tencent.mobileqq.qsec.qsecurity.QSec
 import com.tencent.mobileqq.sign.QQSecuritySign
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -91,6 +92,7 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.requestSign(
     lateinit var o3did: String
 
     val sign = session.withLock {
+        vm.global["est_data"] = QSec.getEst(vm)
         QQSecuritySign.getSign(vm, qua, cmd, buffer, seq, uin).value.also {
             o3did = vm.global["o3did"] as? String ?: ""
             val requiredPacket = vm.global["PACKET"] as ArrayList<SsoPacket>

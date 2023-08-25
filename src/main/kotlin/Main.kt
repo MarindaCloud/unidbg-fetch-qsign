@@ -35,7 +35,6 @@ fun main(args: Array<String>) {
         if (!baseDir.exists() ||
             !baseDir.isDirectory ||
             !baseDir.resolve("libfekit.so").exists() ||
-            !baseDir.resolve("libQSec.so").exists() ||
             !baseDir.resolve("config.json").exists()
             || !baseDir.resolve("dtconfig.json").exists()
         ) {
@@ -46,7 +45,7 @@ fun main(args: Array<String>) {
             println("FEBond sum = ${FEBound.checkCurrent()}")
             CONFIG = json.decodeFromString<QSignConfig>(baseDir.resolve("config.json").readText())
                 .apply { checkIllegal() }
-
+            println("Load Package = ${CONFIG.protocol}")
         }
     }
     CONFIG.server.also {

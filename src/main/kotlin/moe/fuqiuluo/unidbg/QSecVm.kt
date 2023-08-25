@@ -74,7 +74,11 @@ class QSecVM(
     fun init() {
         if (isInit) return
         runCatching {
-            loadLibrary(coreLibPath.resolve("libQSec.so"))
+            coreLibPath.resolve("libpoxy.so").let {
+                if (it.exists()) {
+                    loadLibrary(it)
+                }
+            }
             loadLibrary(coreLibPath.resolve("libfekit.so"))
             global["DeepSleepDetector"] = DeepSleepDetector()
             this.isInit = true

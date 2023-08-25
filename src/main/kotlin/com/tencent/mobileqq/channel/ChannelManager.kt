@@ -11,10 +11,17 @@ object ChannelManager {
 
     fun initReport(vm: QSecVM, qua: String, version: String, androidOs: String = "12", brand: String = "Redmi", model: String = "23013RK75C",
                    qimei36: String = vm.global["qimei36"] as? String ?: "", guid: String = vm.global["guid"] as? String ?: "") {
-        vm.newInstance("com/tencent/mobileqq/channel/ChannelManager", unique = true)
-            .callJniMethod(vm.emulator, "initReport(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
-                qua, version, androidOs, brand + model, qimei36, guid
-            )
+        runCatching {
+            vm.newInstance("com/tencent/mobileqq/channel/ChannelManager", unique = true)
+                .callJniMethod(vm.emulator, "initReport(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+                    qua, version, androidOs, brand + model, qimei36, guid
+                )
+        }.onFailure {
+            vm.newInstance("com/tencent/mobileqq/channel/ChannelManager", unique = true)
+                .callJniMethod(vm.emulator, "initReport(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+                    qua, version, androidOs, brand + model
+                )
+        }
     }
 
     fun onNativeReceive(vm: QSecVM, cmd: String, data: ByteArray, callbackId: Long) {

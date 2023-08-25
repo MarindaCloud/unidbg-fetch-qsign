@@ -33,9 +33,15 @@ object QQSecuritySign {
     }
 
     fun dispatchEvent(vm: QSecVM, cmd: String = "", uin: String = "0") {
-        vm.newInstance("com/tencent/mobileqq/sign/QQSecuritySign", unique = true)
-            .callJniMethod(vm.emulator, "dispatchEvent(Ljava/lang/String;Ljava/lang/String;Lcom/tencent/mobileqq/fe/EventCallback;)V",
-                cmd, uin, vm.newInstance("com/tencent/mobileqq/fe/EventCallback", unique = true))
+        runCatching {
+            vm.newInstance("com/tencent/mobileqq/sign/QQSecuritySign", unique = true)
+                .callJniMethod(vm.emulator, "dispatchEvent(Ljava/lang/String;Ljava/lang/String;Lcom/tencent/mobileqq/fe/EventCallback;)V",
+                    cmd, uin, vm.newInstance("com/tencent/mobileqq/fe/EventCallback", unique = true))
+        }.onFailure {
+            vm.newInstance("com/tencent/mobileqq/sign/QQSecuritySign", unique = true)
+                .callJniMethod(vm.emulator, "dispatchEvent(Ljava/lang/String;Ljava/lang/String;)V", cmd, uin)
+
+        }
     }
 
     fun requestToken(vm: QSecVM) {

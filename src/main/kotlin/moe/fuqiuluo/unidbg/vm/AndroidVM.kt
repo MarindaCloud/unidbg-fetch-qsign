@@ -33,7 +33,7 @@ open class AndroidVM(packageName: String, dynarmic: Boolean, unicorn: Boolean): 
     }
 
     fun loadLibrary(soFile: File): DalvikModule {
-        val dm = vm.loadLibrary(soFile, true)
+        val dm = vm.loadLibrary(soFile, false)
         dm.callJNI_OnLoad(emulator)
         return dm
     }
