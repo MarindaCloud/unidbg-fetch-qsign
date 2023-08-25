@@ -341,7 +341,7 @@ class QSecJni(
             )
         }
         if (signature == "android/content/Context->getPackageName()Ljava/lang/String;") {
-            return StringObject(vm, "com.tencent.mobileqq")
+            return StringObject(vm, envData.packageName)
         }
         if (signature == "java/lang/ClassLoader->loadClass(Ljava/lang/String;)Ljava/lang/Class;") {
             val name = vaList.getObjectArg<StringObject>(0).value

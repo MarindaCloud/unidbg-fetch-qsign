@@ -20,7 +20,7 @@ import java.util.logging.Logger
 
 class FileResolver(
     sdk: Int,
-    vm: QSecVM
+    val vm: QSecVM
 ): AndroidResolver(sdk) {
     private val tmpFilePath = vm.coreLibPath
     private val uuid = UUID.randomUUID()
@@ -98,8 +98,11 @@ class FileResolver(
             return FileResult.failed(UnixEmulator.ENOENT)
         }
 
-        if (path == "/proc/self/cmdline") {
-            return FileResult.success(ByteArrayFileIO(oflags, path, "com.tencent.mobileqq".toByteArray()))
+        if (path == "/proc/self/cmdline"
+            || path == "/proc/${emulator.pid}/cmdline"
+            || path == "/proc/stat/cmdline" // an error case
+        ) {
+            return FileResult.success(ByteArrayFileIO(oflags, path, "${vm.envData.packageName}:MSF".toByteArray()))
         }
 
         if (path == "/proc") {
@@ -112,12 +115,6 @@ class FileResolver(
             return FileResult.success(DirectoryFileIO(oflags, path,
                 DirectoryFileIO.DirectoryEntry(true, "libfekit.so"),
             ))
-        }
-
-        if (path == "/proc/${emulator.pid}/cmdline"
-            || path == "/proc/stat/cmdline" // an error case
-            ) {
-            return FileResult.success(ByteArrayFileIO(oflags, path, "com.tencent.mobileqq:MSF".toByteArray()))
         }
 
         if(path == "/data/app/~~vbcRLwPxS0GyVfqT-nCYrQ==/com.tencent.mobileqq-xJKJPVp9lorkCgR_w5zhyA==/base.apk") {

@@ -17,7 +17,7 @@ class QSecVM(
     val envData: EnvData,
     dynarmic: Boolean,
     unicorn: Boolean
-): Destroyable, AndroidVM("com.tencent.mobileqq", dynarmic, unicorn) {
+): Destroyable, AndroidVM(envData.packageName, dynarmic, unicorn) {
     private var destroy: Boolean = false
     private var isInit: Boolean = false
     internal val global = GlobalData()
@@ -28,9 +28,44 @@ class QSecVM(
             memory.setLibraryResolver(resolver)
             emulator.syscallHandler.addIOResolver(resolver)
             vm.setJni(QSecJni(envData, this, global))
-            vm.addNotFoundClass("com/tencent/mobileqq/dt/Dc")
-            vm.addNotFoundClass("com/tencent/mobileqq/dt/Dte")
 
+            if (envData.packageName == "com.tencent.mobileqq") {
+                vm.setWhiteMode(true)
+                arrayOf(
+                    "android/os/Build\$VERSION",
+                    "android/content/pm/ApplicationInfo",
+                    "com/tencent/mobileqq/fe/IFEKitLog",
+                    "com/tencent/mobileqq/channel/ChannelProxy",
+                    "com/tencent/mobileqq/qsec/qsecurity/QSec",
+                    "com/tencent/mobileqq/qsec/qsecurity/QSecConfig",
+                    "com/tencent/mobileqq/sign/QQSecuritySign\$SignResult",
+                    "java/lang/String",
+                    "com/tencent/mobileqq/qsec/qsecest/QsecEst",
+                    "com/tencent/qqprotect/qsec/QSecFramework",
+                    "com/tencent/mobileqq/dt/app/Dtc",
+                    "android/provider/Settings\$System",
+                    "com/tencent/mobileqq/fe/utils/DeepSleepDetector",
+                    "com/tencent/mobileqq/dt/model/FEBound",
+                    "java/lang/ClassLoader",
+                    "java/lang/Thread",
+                    "android/content/Context",
+                    "android/content/ContentResolver",
+                    "java/io/File",
+                    "java/lang/Integer",
+                    "java/lang/Object",
+                    "com/tencent/mobileqq/sign/QQSecuritySign",
+                    "com/tencent/mobileqq/channel/ChannelManager",
+                    "com/tencent/mobileqq/dt/Dtn",
+                    "com/tencent/mobileqq/qsec/qsecdandelionsdk/Dandelion",
+                    "com/tencent/mobileqq/qsec/qsecprotocol/ByteData",
+                    "com/tencent/mobileqq/qsec/qseccodec/SecCipher",
+                ).forEach {
+                    vm.addFilterClass(it)
+                }
+            } else {
+                vm.addFilterClass("com/tencent/mobileqq/dt/Dc")
+                vm.addFilterClass("com/tencent/mobileqq/dt/Dte")
+            }
         }.onFailure {
             it.printStackTrace()
         }

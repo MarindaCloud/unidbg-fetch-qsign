@@ -3,6 +3,7 @@ package moe.fuqiuluo.comm
 
 import CONFIG
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonNames
 
@@ -20,6 +21,7 @@ data class EnvData(
     var guid: String,
     var qimei36: String,
 
+    var packageName: String = CONFIG.protocol.packageName ?: "com.tencent.mobileqq",
     var qua: String = CONFIG.protocol.qua,
     var version: String = CONFIG.protocol.version,
     var code: String = CONFIG.protocol.code
@@ -27,6 +29,8 @@ data class EnvData(
 
 @Serializable
 data class Protocol(
+    @SerialName("package_name")
+    var packageName: String? = null,
     var qua: String,
     var version: String,
     var code: String

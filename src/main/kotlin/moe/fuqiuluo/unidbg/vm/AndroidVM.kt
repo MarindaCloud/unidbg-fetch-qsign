@@ -3,6 +3,7 @@ package moe.fuqiuluo.unidbg.vm
 import CONFIG
 import com.github.unidbg.arm.backend.DynarmicFactory
 import com.github.unidbg.arm.backend.Unicorn2Factory
+import com.github.unidbg.arm.backend.KvmFactory
 import com.github.unidbg.linux.android.AndroidEmulatorBuilder
 import com.github.unidbg.linux.android.dvm.DalvikModule
 import com.github.unidbg.linux.android.dvm.DvmClass
@@ -17,6 +18,7 @@ open class AndroidVM(packageName: String, dynarmic: Boolean, unicorn: Boolean): 
         .apply {
             if (dynarmic) addBackendFactory(DynarmicFactory(true))
             if (unicorn) addBackendFactory(Unicorn2Factory(true))
+            //if (unicorn) addBackendFactory(KvmFactory(true))
         }
         .build()!!
     protected val memory = emulator.memory!!
@@ -31,7 +33,7 @@ open class AndroidVM(packageName: String, dynarmic: Boolean, unicorn: Boolean): 
     }
 
     fun loadLibrary(soFile: File): DalvikModule {
-        val dm = vm.loadLibrary(soFile, false)
+        val dm = vm.loadLibrary(soFile, true)
         dm.callJNI_OnLoad(emulator)
         return dm
     }
