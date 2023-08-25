@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.security.SecureRandom
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.random.Random
 import kotlin.random.nextInt
 
@@ -376,6 +377,12 @@ class QSecJni(
             return vm.resolveClass("android/content/ContentResolver")
                 .newObject(null)
         }
+        if (signature == "android/content/pm/PackageManager->queryIntentServices(Landroid/content/Intent;I)Ljava/util/List;") {
+            return vm.resolveClass("java/util/List").newObject(ArrayList<Nothing>())
+        }
+        if (signature == "android/content/Intent->addCategory(Ljava/lang/String;)Landroid/content/Intent;") {
+            return dvmObject
+        }
         if (signature == "android/content/Context->getPackageResourcePath()Ljava/lang/String;") {
             return StringObject(
                 vm,
@@ -447,6 +454,11 @@ class QSecJni(
         }
         if (signature == "com/tencent/mobileqq/sign/QQSecuritySign\$SignResult-><init>()V") {
             return QQSecuritySign.SignResultObject(vm)
+        }
+        if (signature == "android/content/Intent-><init>(Ljava/lang/String;)V") {
+            return vm
+                .resolveClass("android/content/Intent")
+                .newObject(hashMapOf("action" to (vaList.getObjectArg(0) as StringObject).value))
         }
         return super.newObjectV(vm, dvmClass, signature, vaList)
     }
