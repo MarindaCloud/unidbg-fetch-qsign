@@ -392,9 +392,13 @@ class QSecJni(
             return vm.resolveClass("android/content/pm/ApplicationInfo").newObject(null)
         }
         if (signature == "android/content/Context->getFilesDir()Ljava/io/File;") {
-            return vm
-                .resolveClass("android/content/Context", vm.resolveClass("java.io.File"))
-                .newObject(File("/data/user/0/${envData.packageName}/files"))
+            return if (envData.packageName == "3.5.1") {
+                vm.resolveClass("android/content/Context", vm.resolveClass("java/io/File"))
+                    .newObject(File("/data/user/0/${envData.packageName}/files"))
+            } else {
+                vm.resolveClass("java/io/File", vm.resolveClass("android/content/Context"))
+                    .newObject(File("/data/user/0/${envData.packageName}/files"))
+            }
         }
         if (signature == "android/content/Context->getContentResolver()Landroid/content/ContentResolver;") {
             return vm.resolveClass("android/content/ContentResolver")
