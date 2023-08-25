@@ -11,7 +11,7 @@ object Dtn {
         }.onFailure {
             vm.newInstance("com/tencent/mobileqq/dt/Dtn", unique = true)
                 .callJniMethod(vm.emulator, "initContext(Landroid/content/Context;Ljava/lang/String;)V",
-                    context, "/data/user/0/com.tencent.mobileqq/files/5463306EE50FE3AA")
+                    context, "/data/user/0/${vm.envData.packageName}/files/5463306EE50FE3AA")
         }
     }
 

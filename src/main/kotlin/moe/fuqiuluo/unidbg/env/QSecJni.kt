@@ -79,6 +79,10 @@ class QSecJni(
             return
         }
 
+        if (signature == "com/tencent/secprotocol/ByteData->putUping(IIILjava/lang/Object;)V") {
+            return
+        }
+
         super.callVoidMethodV(vm, dvmObject, signature, vaList)
     }
 
@@ -108,7 +112,7 @@ class QSecJni(
         if (signature == "android/content/pm/ApplicationInfo->nativeLibraryDir:Ljava/lang/String;") {
             return StringObject(
                 vm,
-                "/data/app/~~vbcRLwPxS0GyVfqT-nCYrQ==/com.tencent.mobileqq-xJKJPVp9lorkCgR_w5zhyA==/lib/arm64"
+                "/data/app/~~vbcRLwPxS0GyVfqT-nCYrQ==/${envData.packageName}-xJKJPVp9lorkCgR_w5zhyA==/lib/arm64"
             )
         }
         return super.getObjectField(vm, dvmObject, signature)
@@ -290,7 +294,7 @@ class QSecJni(
                 1 -> "k1"
                 23 -> "8" // CPU数量
                 25 -> "0.0.12"
-                26 -> "90721e0b3a587f77503b6abedd960c2e" // 签名md5
+                26 -> "90721e0b3a587f77503b6abedd960c2e".uppercase() // 签名md5
                 27 -> "0"  // 是否有xposed
                 28 -> envData.packageName
                 31 -> "0" // 是否锁屏
@@ -318,7 +322,7 @@ class QSecJni(
                 78 -> "su" // su Bin
                 79 -> "1.1.2"
                 81 -> "zh"
-                82 -> "90721e0b3aaa7f77503b6abedd960c2e"
+                82 -> "90721e0b3aaa7f77503b6abedd960c2e".uppercase()
                 83 -> "0"
                 86 -> fun(): String {
                     val data = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toCharArray()
@@ -337,7 +341,26 @@ class QSecJni(
             })
         }
 
+        if ("com/tencent/secprotocol/t/s->c(Landroid/content/Context;)Ljava/lang/String;" == signature) {
+            return StringObject(vm, envData.packageName)
+        }
+
+        if ("com/tencent/secprotocol/t/s->d(Landroid/content/Context;)Ljava/lang/String;" == signature) {
+            return StringObject(vm, "90721e0b3a587f77503b6abedd960c2e".uppercase())
+        }
+
         return super.callStaticObjectMethodV(vm, dvmClass, signature, vaList)
+    }
+
+    override fun callStaticIntMethodV(vm: BaseVM?, dvmClass: DvmClass?, signature: String?, vaList: VaList?): Int {
+        if ("com/tencent/secprotocol/t/s->e(Landroid/content/Context;)I" == signature) {
+            return when (envData.version) {
+                "3.5.1" -> 345546704
+                "3.5.2" -> 345971138
+                else -> error("不支持该TIM版本")
+            }
+        }
+        return super.callStaticIntMethodV(vm, dvmClass, signature, vaList)
     }
 
     override fun callStaticVoidMethodV(vm: BaseVM, dvmClass: DvmClass, signature: String, vaList: VaList) {
@@ -370,8 +393,8 @@ class QSecJni(
         }
         if (signature == "android/content/Context->getFilesDir()Ljava/io/File;") {
             return vm
-                .resolveClass("java.io.File")
-                .newObject(File("/data/user/0/com.tencent.mobileqq/files"))
+                .resolveClass("android/content/Context", vm.resolveClass("java.io.File"))
+                .newObject(File("/data/user/0/${envData.packageName}/files"))
         }
         if (signature == "android/content/Context->getContentResolver()Landroid/content/ContentResolver;") {
             return vm.resolveClass("android/content/ContentResolver")
@@ -386,7 +409,7 @@ class QSecJni(
         if (signature == "android/content/Context->getPackageResourcePath()Ljava/lang/String;") {
             return StringObject(
                 vm,
-                "/data/app/~~vbcRLwPxS0GyVfqT-nCYrQ==/com.tencent.mobileqq-xJKJPVp9lorkCgR_w5zhyA==/base.apk"
+                "/data/app/~~vbcRLwPxS0GyVfqT-nCYrQ==/${envData.packageName}-xJKJPVp9lorkCgR_w5zhyA==/base.apk"
             )
         }
         if (signature == "android/content/Context->getPackageName()Ljava/lang/String;") {
@@ -427,6 +450,9 @@ class QSecJni(
             return vm.resolveClass("java/io/File")
                 .newObject(File("/mnt/sdcard"))
         }
+        if ("android/content/Context->toString()Ljava/lang/String;" == signature) {
+            return StringObject(vm, dvmObject.value.toString())
+        }
         return super.callObjectMethodV(vm, dvmObject, signature, vaList)
     }
 
@@ -443,6 +469,11 @@ class QSecJni(
             println("Accept ${ if (isStatic) "static" else "" } $signature")
         }
         return super.acceptMethod(dvmClass, signature, isStatic)
+    }
+
+    override fun toReflectedMethod(vm: BaseVM?, dvmClass: DvmClass?, signature: String?): DvmObject<*> {
+        //println("toReflectedMethod")
+        return super.toReflectedMethod(vm, dvmClass, signature)
     }
 
     override fun newObjectV(vm: BaseVM, dvmClass: DvmClass, signature: String, vaList: VaList): DvmObject<*> {
@@ -472,8 +503,8 @@ class QSecJni(
         if (signature == "java/io/File->canRead()Z") {
             val file = dvmObject.value as File
             if (
-                file.toString() == "\\data\\data\\com.tencent.mobileqq\\.." ||
-                file.toString() == "/data/data/com.tencent.mobileqq/.." ||
+                file.toString() == "\\data\\data\\${envData.packageName}\\.." ||
+                file.toString() == "/data/data/${envData.packageName}/.." ||
                 file.toString() == "/data/data/" ||
                 file.toString() == "/data/data"
             ) {
