@@ -2,7 +2,7 @@
   <configuration default="false" name="MainKt" type="JetRunConfigurationType" nameIsGenerated="true">
     <option name="MAIN_CLASS_NAME" value="MainKt" />
     <module name="unidbg-fetch-qsign.main" />
-    <option name="PROGRAM_PARAMETERS" value="--basePath=txlib\8.9.73" />
+    <option name="PROGRAM_PARAMETERS" value="--basePath=txlib\3.5.1" />
     <shortenClasspath name="NONE" />
     <method v="2">
       <option name="Make" enabled="true" />
